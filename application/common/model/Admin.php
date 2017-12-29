@@ -60,6 +60,7 @@ class Admin extends Model
             if ($values && is_array($values)){
                 $values['id'] = $id;
                 $values['token'] = self::createToken($id);
+                $values['authRules'] = isset($values['authRules']) ? json_encode($values['authRules']) : '';
                 $res = $redis->hMset($key, $values);
                 $values = $values['token'];
             }
@@ -69,6 +70,7 @@ class Admin extends Model
                 return $info;
             }
             if (!empty($info['id']) && !empty($info['token']) && $info['token'] == $values){
+                $info['authRules'] = isset($info['authRules']) ? json_encode($info['authRules']) : '';
                 return $info;
             }
         }else{

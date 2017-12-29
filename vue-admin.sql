@@ -34,18 +34,12 @@ CREATE TABLE `lmx_admin` (
   PRIMARY KEY (`id`),
   KEY `user_login_key` (`username`),
   KEY `user_nicename` (`tel`)
-) ENGINE=MyISAM AUTO_INCREMENT=12 DEFAULT CHARSET=utf8 COMMENT='管理员表';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='管理员表';
 
 -- ----------------------------
 -- Records of lmx_admin
 -- ----------------------------
-INSERT INTO `lmx_admin` VALUES ('2', 'admin', 'c3284d0f94606de1fd2af172aba15bf3', 'admin', 'lmxdawn@gmail.com', null, '0', '127.0.0.1', '1493103488', '1487868050', '1');
-INSERT INTO `lmx_admin` VALUES ('5', 'demo', '6c5ac7b4d3bd3311f033f971196cfa75', 'demo', '862253272@qq.com', null, '1', '127.0.0.1', '1488169490', '1487966028', '1');
-INSERT INTO `lmx_admin` VALUES ('6', 'demo1', '655e9d2a52f932bdde5ba3e0c544a6b9', 'demo1', '', null, '0', null, '0', '1487966314', '1');
-INSERT INTO `lmx_admin` VALUES ('7', 'test', 'fb469d7ef430b0baf0cab6c436e70375', '', '', null, '0', null, '0', '1511865902', '0');
-INSERT INTO `lmx_admin` VALUES ('8', 'test2', '7bfc85c0d74ff05806e0b5a0fa0c1df1', '', '', null, '0', null, '0', '1511868251', '0');
-INSERT INTO `lmx_admin` VALUES ('9', 'test3', '7bfc85c0d74ff05806e0b5a0fa0c1df1', '', '', null, '0', null, '0', '1511868307', '1');
-INSERT INTO `lmx_admin` VALUES ('10', 's', '0305d718926ac8776a442023509c21ce', '', '', null, '0', null, '0', '1511868379', '1');
+INSERT INTO `lmx_admin` VALUES ('1', 'admin', 'c3284d0f94606de1fd2af172aba15bf3', 'admin', 'lmxdawn@gmail.com', null, '0', '127.0.0.1', '1493103488', '1487868050', '1');
 
 -- ----------------------------
 -- Table structure for lmx_auth_access
@@ -84,6 +78,22 @@ CREATE TABLE `lmx_auth_rule` (
 -- ----------------------------
 -- Records of lmx_auth_rule
 -- ----------------------------
+INSERT INTO `lmx_auth_rule` VALUES ('1', '0', 'user_manage', '用户管理', '1', '', '999', '1514526793', '1514526793');
+INSERT INTO `lmx_auth_rule` VALUES ('2', '1', 'user_manage/admin', '管理组', '1', '', '999', '1514526814', '1514526814');
+INSERT INTO `lmx_auth_rule` VALUES ('3', '2', 'admin/admin/index', '管理员管理', '1', '', '999', '1514526827', '1514526827');
+INSERT INTO `lmx_auth_rule` VALUES ('4', '3', 'admin/admin/save', '添加管理员', '1', '', '999', '1514526964', '1514526964');
+INSERT INTO `lmx_auth_rule` VALUES ('5', '3', 'admin/admin/edit', '编辑管理员', '1', '', '999', '1514527000', '1514527000');
+INSERT INTO `lmx_auth_rule` VALUES ('6', '3', 'admin/admin/delete', '删除管理员', '1', '', '999', '1514527028', '1514527028');
+INSERT INTO `lmx_auth_rule` VALUES ('7', '2', 'admin/role/index', '角色管理', '1', '', '999', '1514527048', '1514527048');
+INSERT INTO `lmx_auth_rule` VALUES ('8', '7', 'admin/role/save', '添加角色', '1', '', '999', '1514527080', '1514527080');
+INSERT INTO `lmx_auth_rule` VALUES ('9', '7', 'admin/role/edit', '编辑角色', '1', '', '999', '1514527090', '1514527090');
+INSERT INTO `lmx_auth_rule` VALUES ('10', '7', 'admin/role/delete', '删除角色', '1', '', '999', '1514527111', '1514527111');
+INSERT INTO `lmx_auth_rule` VALUES ('11', '7', 'admin/role/auth', '角色授权', '1', '', '999', '1514527131', '1514527131');
+INSERT INTO `lmx_auth_rule` VALUES ('12', '2', 'admin/authrule/index', '权限管理', '1', '', '999', '1514527153', '1514527153');
+INSERT INTO `lmx_auth_rule` VALUES ('13', '12', 'admin/authrule/save', '添加权限', '1', '', '999', '1514527182', '1514527182');
+INSERT INTO `lmx_auth_rule` VALUES ('14', '12', 'admin/authrule/edit', '编辑权限', '1', '', '999', '1514527195', '1514527209');
+INSERT INTO `lmx_auth_rule` VALUES ('15', '12', 'admin/authrule/delete', '删除权限', '1', '', '999', '1514527223', '1514527223');
+
 
 -- ----------------------------
 -- Table structure for lmx_role
@@ -101,13 +111,12 @@ CREATE TABLE `lmx_role` (
   PRIMARY KEY (`id`),
   KEY `parentId` (`pid`),
   KEY `status` (`status`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COMMENT='角色表';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='角色表';
 
 -- ----------------------------
 -- Records of lmx_role
 -- ----------------------------
 INSERT INTO `lmx_role` VALUES ('1', '超级管理员', '0', '1', '拥有网站最高管理员权限！', '1329633709', '1329633709', '0');
-INSERT INTO `lmx_role` VALUES ('2', '普通管理', '0', '1', '测试', '0', '0', '0');
 
 -- ----------------------------
 -- Table structure for lmx_role_admin
@@ -117,14 +126,5 @@ CREATE TABLE `lmx_role_admin` (
   `role_id` int(11) unsigned DEFAULT '0' COMMENT '角色 id',
   `admin_id` int(11) DEFAULT '0' COMMENT '管理员id',
   KEY `group_id` (`role_id`),
-  KEY `user_id` (`admin_id`)
+  KEY `admin_id` (`admin_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='用户角色对应表';
-
--- ----------------------------
--- Records of lmx_role_admin
--- ----------------------------
-INSERT INTO `lmx_role_admin` VALUES ('1', '3');
-INSERT INTO `lmx_role_admin` VALUES ('3', '3');
-INSERT INTO `lmx_role_admin` VALUES ('1', '5');
-INSERT INTO `lmx_role_admin` VALUES ('2', '2');
-INSERT INTO `lmx_role_admin` VALUES ('2', '5');
