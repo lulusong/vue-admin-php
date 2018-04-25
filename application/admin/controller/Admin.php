@@ -50,14 +50,15 @@ class Admin extends BaseCheckUser
             ->paginate($paginate);
 
         foreach ($lists as $k => $v) {
-            $lists[$k]['avatar'] = AdminModel::getAvatarUrl($v['avatar']);
+            $v['avatar'] = AdminModel::getAvatarUrl($v['avatar']);
             $roles = RoleAdmin::where('admin_id',$v['id'])->field('role_id')->select();
             $temp_roles = [];
             if ($roles){
                 $temp_roles = $roles->toArray();
                 $temp_roles = array_column($temp_roles,'role_id');
             }
-            $lists[$k]['roles'] = $temp_roles;
+            $v['roles'] = $temp_roles;
+            $lists[$k] = $v;
         }
 
         $role_list = Role::where('status',1)
