@@ -151,10 +151,19 @@ class Admin extends BaseCheckUser
         $AdminModel = AdminModel::where('id',$id)
             ->field('id,username')
             ->find();
-        if (!$AdminModel || $AdminModel->username == 'admin'){
+        if (!$AdminModel){
             $res = [];
             $res['errcode'] = ErrorCode::$DATA_NOT;
             $res['errmsg'] = '管理员不存在';
+            return json($res);
+        }
+        $loginInfo = $this->adminInfo;
+        $loginUserName = isset($loginInfo['username']) ? $loginInfo['username'] : '';
+        // 如果是超级管理员，判断当前登录用户是否匹配
+        if ($AdminModel->username == 'admin' && $loginUserName != $AdminModel->username){
+            $res = [];
+            $res['errcode'] = ErrorCode::$DATA_NOT;
+            $res['errmsg'] = '最高权限用户，无权修改';
             return json($res);
         }
 
