@@ -177,13 +177,6 @@ class Login extends Base
         $new_password = request()->post('new_password');
 
         $admin_info = Admin::where('id',$id)->field('username,password')->find();
-        $loginUserName = isset($loginInfo['username']) ? $loginInfo['username'] : '';
-        if ($admin_info['username'] == 'admin' && $loginUserName != $admin_info['username']){
-            $res = [];
-            $res['errcode'] = ErrorCode::$DATA_NOT;
-            $res['errmsg'] = '最高权限用户，无权修改';
-            return json($res);
-        }
         if ($admin_info['password'] != Admin::getPass($old_password)){
             $res = [];
             $res['errcode'] = ErrorCode::$USER_AUTH_FAIL;
