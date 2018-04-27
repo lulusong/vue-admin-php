@@ -76,13 +76,13 @@ class Login extends Base
             }
         }
         $info['authRules'] = $authRules;
-//        $info['authRules'] = [
-//            'user_manage',
-//            'user_manage/admin',
-//            'admin/admin/index',
-//            'admin/role/index',
-//            'admin/authRule/index',
-//        ];
+        //        $info['authRules'] = [
+        //            'user_manage',
+        //            'user_manage/admin',
+        //            'admin/admin/index',
+        //            'admin/role/index',
+        //            'admin/authRule/index',
+        //        ];
         // 保存用户信息
         $loginInfo = Admin::loginInfo($info['id'],$info);
         $res = [];
@@ -177,10 +177,11 @@ class Login extends Base
         $new_password = request()->post('new_password');
 
         $admin_info = Admin::where('id',$id)->field('username,password')->find();
-        if ($admin_info['username'] == 'admin'){
+        $loginUserName = isset($loginInfo['username']) ? $loginInfo['username'] : '';
+        if ($admin_info['username'] == 'admin' && $loginUserName != $admin_info['username']){
             $res = [];
-            $res['errcode'] = ErrorCode::$USER_AUTH_FAIL;
-            $res['errmsg'] = '超级管理员不能修改密码';
+            $res['errcode'] = ErrorCode::$DATA_NOT;
+            $res['errmsg'] = '最高权限用户，无权修改';
             return json($res);
         }
         if ($admin_info['password'] != Admin::getPass($old_password)){
