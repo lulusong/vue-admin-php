@@ -70,7 +70,7 @@ class Admin extends Model
                 return $info;
             }
             if (!empty($info['id']) && !empty($info['token']) && $info['token'] == $values){
-                $info['authRules'] = isset($info['authRules']) ? json_encode($info['authRules']) : '';
+                $info['authRules'] = isset($info['authRules']) ? json_decode($info['authRules']) : '';
                 return $info;
             }
         }else{
