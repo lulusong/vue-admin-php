@@ -189,13 +189,17 @@ class Upload extends Base
         $baseUrl = get_asset_upload_path();
         /* 获取参数 */
         $size = request()->get('size/d',20);
-        $start = request()->get('start/d',0);
-        $end = $start + $size;
+        $page = request()->get('page/d',1);
         $basePath = self::getBasePath();
         /* 获取文件列表 */
         $files = self::getFiles($basePath, $pathName, $baseUrl);
         /* 获取指定范围的列表 */
         $len = count($files);
+        $page = $page <= 0 ? 1 : $page;
+        $countpage = ceil($len / $size); // 计算总页面数
+        $page = $page > $countpage ? $countpage : $page;
+        $start = $page * $size -  $size;
+        $end = $start + $size;
         for ($i = min($end, $len) - 1, $list = array(); $i < $len && $i >= 0 && $i >= $start; $i--){
             $list[] = $files[$i];
         }
