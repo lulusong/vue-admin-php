@@ -31,8 +31,72 @@ class Upload extends Base
     /**
      * 获取上传文件的根路径
      */
-    public static function getBasePath(){
+    private static function getBasePath(){
         return Env::get('root_path') . 'public' . DIRECTORY_SEPARATOR . 'uploads'. DIRECTORY_SEPARATOR;
+    }
+
+    public function newDir() {
+        // 创建目录
+        $pathName = request()->post("pathName");
+        $basePath = self::getBasePath();
+        $pathName = substr($pathName, 0, 1) == '/' ? substr($pathName, 1) : $pathName; // 去掉第一个 /
+        $dirname = $basePath . $pathName;
+        $dirname = str_replace(' ', '', $dirname);
+        if (!file_exists($dirname)){
+            // 目录不存在
+            $res = [];
+            $res['errcode'] = ErrorCode::$DATA_NOT;
+            $res['errmsg'] = '目录不存在~';
+            return json($res);
+        }
+        $filename = request()->post('filename');
+        $filename = trim($filename, '/'); // 去掉最后一个 / 并且加上一个 /
+        $dirname = $dirname . DIRECTORY_SEPARATOR . $filename;
+        $dirname = str_replace(' ', '', $dirname);
+        if (file_exists($dirname)){
+            // 目录已存在
+            $res = [];
+            $res['errcode'] = ErrorCode::$DATA_NOT;
+            $res['errmsg'] = '文件夹已存在~';
+            $res['path'] = $pathName . $filename;
+            return json($res);
+        }
+        try {
+            // 如果含有中文
+            if (preg_match('/[\x{4e00}-\x{9fa5}]/u', $dirname) > 0) {
+                $res = [];
+                $res['errcode'] = ErrorCode::$DATA_NOT;
+                $res['errmsg'] = '不能含有中文~';
+                return json($res);
+            }
+            $dirname = str_replace(' ', '', $dirname);
+            if (!mkdir($dirname, 0755, true)) {
+                // 目录不存在
+                $res = [];
+                $res['errcode'] = ErrorCode::$DATA_NOT;
+                $res['errmsg'] = '无权限创建目录~';
+                return json($res);
+            }
+        }catch (\Exception $exception) {
+            $res = [];
+            $res['errcode'] = ErrorCode::$DATA_NOT;
+            $res['errmsg'] = '无权限创建~~';
+            return json($res);
+        }
+        $path = $pathName . '/' . $filename;
+        $path = str_replace("\\", "/", $path);
+        $res = array(
+            "path" => $path,
+            "filename" => $filename,
+            "className" => '',
+            'url' => get_asset_upload_path($path),
+            'mtime' => time(),
+            "is_dir" => 1,
+            "fileExt" => '',
+            "size" => 0
+        );
+
+        return json($res);
     }
 
     /**
@@ -44,70 +108,6 @@ class Upload extends Base
         /**
          * @var File $uploadFile
          */
-        $isNewDir = request()->param('isNewDir/d');
-        // 创建目录
-        if ($isNewDir) {
-            $pathName = request()->post("pathName");
-            $basePath = self::getBasePath();
-            $pathName = substr($pathName, 0, 1) == '/' ? substr($pathName, 1) : $pathName; // 去掉第一个 /
-            $dirname = $basePath . $pathName;
-            $dirname = str_replace(' ', '', $dirname);
-            if (!file_exists($dirname)){
-                // 目录不存在
-                $res = [];
-                $res['errcode'] = ErrorCode::$DATA_NOT;
-                $res['errmsg'] = '目录不存在~';
-                return json($res);
-            }
-            $filename = request()->post('filename');
-            $filename = trim($filename, '/'); // 去掉最后一个 / 并且加上一个 /
-            $dirname = $dirname . $filename;
-            $dirname = str_replace(' ', '', $dirname);
-            if (file_exists($dirname)){
-                // 目录已存在
-                $res = [];
-                $res['errcode'] = ErrorCode::$DATA_NOT;
-                $res['errmsg'] = '文件夹已存在~';
-                $res['path'] = $pathName . $filename;
-                return json($res);
-            }
-            try {
-                // 如果含有中文
-                if (preg_match('/[\x{4e00}-\x{9fa5}]/u', $dirname) > 0) {
-                    $res = [];
-                    $res['errcode'] = ErrorCode::$DATA_NOT;
-                    $res['errmsg'] = '不能含有中文~';
-                    return json($res);
-                }
-                $dirname = str_replace(' ', '', $dirname);
-                if (!mkdir($dirname, 0755, true)) {
-                    // 目录不存在
-                    $res = [];
-                    $res['errcode'] = ErrorCode::$DATA_NOT;
-                    $res['errmsg'] = '无权限创建目录~';
-                    return json($res);
-                }
-            }catch (\Exception $exception) {
-                $res = [];
-                $res['errcode'] = ErrorCode::$DATA_NOT;
-                $res['errmsg'] = '无权限创建~~';
-                return json($res);
-            }
-            $path = $pathName . $filename;
-            $path = str_replace("\\", "/", $path);
-            $res = array(
-                "path" => empty($pathName) ? "/" . $path : $path,
-                "filename" => $filename,
-                "className" => '',
-                'url' => get_asset_upload_path($path),
-                'mtime' => time(),
-                "is_dir" => 1,
-                "fileExt" => '',
-                "size" => 0
-            );
-
-            return json($res);
-        }
         // 上传文件
         $uploadName = request()->param('uploadName');
         $uploadFile = request()->file($uploadName);
@@ -130,7 +130,7 @@ class Upload extends Base
         $pathName = substr($pathName, 0, 1) == '/' ? substr($pathName, 1) : $pathName; // 去掉第一个 /
         $basePath = self::getBasePath();
         $dirname = $basePath . $pathName;
-        if (!is_dir($dirname)){
+        if (!is_dir(dirname($dirname))){
             // 目录不存在
             $res = [];
             $res['errcode'] = ErrorCode::$DATA_NOT;
@@ -240,7 +240,7 @@ class Upload extends Base
                 }
                 $path3 = $pathName . "/" . $filename;
                 $url = $baseUrl . $path3;
-                $path3 = substr($path3, 0, 1) !== '/' ?  '/' . $path3 : $path3;
+                $path3 = substr($path3, 0, 1) === '/' ?  substr($path3, 1) : $path3;
                 $files[] = array(
                     "path" => $path3,
                     "filename" => $filename,
