@@ -223,7 +223,6 @@ class Upload extends Base
         $path = $basePath .$pathName;
         if (!is_dir($path)) return null;
         if(substr($path, strlen($path) - 1) != '/') $path .= '/';
-        $baseUrl = trim($baseUrl, '/');
         $handle = opendir($path);
         $files = [];
         while (false !== ($filename = readdir($handle))) {
