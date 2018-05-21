@@ -3,6 +3,7 @@
 namespace app\admin\controller;
 
 use app\admin\model\ErrorCode;
+use think\Exception;
 use think\facade\Env;
 use think\File;
 
@@ -28,21 +29,27 @@ class Upload extends Base
         'zip' => 'fileicon-small-zip',
     ];
 
+    public static $RESOURCES_PATH = 'resources' . DIRECTORY_SEPARATOR;
+
     /**
      * 获取上传文件的根路径
      */
-    private static function getBasePath(){
-        return Env::get('root_path') . 'public' . DIRECTORY_SEPARATOR . 'uploads'. DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR;
+    private static function getBasePath()
+    {
+        return Env::get('root_path') . 'public' . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR;
     }
 
-    public function newDir() {
+    public function newDir()
+    {
         // 创建目录
         $pathName = request()->post("pathName");
         $basePath = self::getBasePath();
-        $pathName = substr($pathName, 0, 1) == '/' ? substr($pathName, 1) : $pathName; // 去掉第一个 /
+        $pathName = trim($pathName, '/'); // 去掉最前或者最后的 /
+        $pathName = trim($pathName, '\\'); // 去掉最前或者最后的 \
+        $pathName = self::$RESOURCES_PATH . $pathName;
         $dirname = $basePath . $pathName;
         $dirname = str_replace(' ', '', $dirname);
-        if (!file_exists($dirname)){
+        if (!file_exists($dirname)) {
             // 目录不存在
             $res = [];
             $res['errcode'] = ErrorCode::$DATA_NOT;
@@ -50,10 +57,10 @@ class Upload extends Base
             return json($res);
         }
         $filename = request()->post('filename');
-        $filename = trim($filename, '/'); // 去掉最后一个 / 并且加上一个 /
+        $filename = trim($filename, DIRECTORY_SEPARATOR); // 去掉最后一个 / 并且加上一个 /
         $dirname = $dirname . DIRECTORY_SEPARATOR . $filename;
         $dirname = str_replace(' ', '', $dirname);
-        if (file_exists($dirname)){
+        if (file_exists($dirname)) {
             // 目录已存在
             $res = [];
             $res['errcode'] = ErrorCode::$DATA_NOT;
@@ -77,7 +84,7 @@ class Upload extends Base
                 $res['errmsg'] = '无权限创建目录~';
                 return json($res);
             }
-        }catch (\Exception $exception) {
+        } catch (\Exception $exception) {
             $res = [];
             $res['errcode'] = ErrorCode::$DATA_NOT;
             $res['errmsg'] = '无权限创建~~';
@@ -118,7 +125,7 @@ class Upload extends Base
             $res['ss'] = $uploadName;
             return json($res);
         }
-        $pinYinName = request()->param('pinYinName','');
+        $pinYinName = request()->param('pinYinName', '');
         // 如果没有拼音的名称并且含有中文
         if (!$pinYinName && preg_match('/[\x{4e00}-\x{9fa5}]/u', $uploadFile->getInfo('name')) > 0) {
             $res = [];
@@ -127,19 +134,22 @@ class Upload extends Base
             return json($res);
         }
         $pathName = request()->param("pathName");
-        $pathName = substr($pathName, 0, 1) == '/' ? substr($pathName, 1) : $pathName; // 去掉第一个 /
+        $pathName = trim($pathName, '/'); // 去掉最前或者最后的 /
+        $pathName = trim($pathName, '\\'); // 去掉最前或者最后的 \
+        $pathName = self::$RESOURCES_PATH . $pathName;
         $basePath = self::getBasePath();
         $dirname = $basePath . $pathName;
-        if (!is_dir(dirname($dirname))){
+        if (!is_dir(dirname($dirname))) {
             // 目录不存在
             $res = [];
             $res['errcode'] = ErrorCode::$DATA_NOT;
             $res['errmsg'] = '目录不存在~';
+            $res['path'] = $dirname;
             return json($res);
         }
         $exts = request()->param("exts");
         $size = request()->param("size/d");
-        $path = $pathName ?  $pathName . DIRECTORY_SEPARATOR : $pathName;
+        $path = $pathName ? $pathName . DIRECTORY_SEPARATOR : $pathName;
         $config = [];
         if ($size > 0) {
             $config['size'] = $size;
@@ -153,7 +163,7 @@ class Upload extends Base
         //dump($file);exit;
         // 移动到框架应用根目录/public/uploads/ 目录下
         $filepath = self::getBasePath() . $path;
-        $info = $uploadFile->validate($config)->move($filepath,$savename,false);
+        $info = $uploadFile->validate($config)->move($filepath, $savename, false);
         if (!$info) {
             $res['errcode'] = ErrorCode::$DATA_NOT;
             $res['errmsg'] = $uploadFile->getError();
@@ -172,9 +182,8 @@ class Upload extends Base
             'mtime' => time(),
             "is_dir" => 0,
             "fileExt" => $fileExt,
-            "size" => $uploadFile->getSize()
+            "size" => $info->getSize()
         );
-
         return json($res);
     }
 
@@ -183,13 +192,15 @@ class Upload extends Base
      */
     public function imageList()
     {
-        $pathName = request()->get("pathName","");
+        $pathName = request()->get("pathName", "");
         $pathName = urldecode($pathName);
-        $pathName = substr($pathName, 0, 1) === '/' ? substr($pathName, 1) : $pathName;
+        $pathName = trim($pathName, '/'); // 去掉最前或者最后的 /
+        $pathName = trim($pathName, '\\'); // 去掉最前或者最后的 \
+        $pathName = self::$RESOURCES_PATH . $pathName;
         $baseUrl = get_asset_upload_path();
         /* 获取参数 */
-        $size = request()->get('size/d',20);
-        $page = request()->get('page/d',1);
+        $size = request()->get('size/d', 20);
+        $page = request()->get('page/d', 1);
         $basePath = self::getBasePath();
 
         // 检查资源文件是否存在
@@ -207,17 +218,17 @@ class Upload extends Base
         $page = $page <= 0 ? 1 : $page;
         $countpage = ceil($len / $size); // 计算总页面数
         $page = $page > $countpage ? $countpage : $page;
-        $start = $page * $size -  $size;
+        $start = $page * $size - $size;
         $end = $start + $size;
-        for ($i = min($end, $len) - 1, $list = array(); $i < $len && $i >= 0 && $i >= $start; $i--){
+        for ($i = min($end, $len) - 1, $list = array(); $i < $len && $i >= 0 && $i >= $start; $i--) {
             $list[] = $files[$i];
         }
         $res = [];
         $res['total'] = $len;
         $res['list'] = $list;
+        $res['pathName'] = $pathName;
         return json($res);
     }
-
 
 
     /**
@@ -229,9 +240,9 @@ class Upload extends Base
      */
     private static function getFiles($basePath, $pathName, $baseUrl)
     {
-        $path = $basePath .$pathName;
+        $path = $basePath . $pathName;
         if (!is_dir($path)) return null;
-        if(substr($path, strlen($path) - 1) != '/') $path .= '/';
+        if (substr($path, strlen($path) - 1) != '/') $path .= '/';
         $handle = opendir($path);
         $files = [];
         while (false !== ($filename = readdir($handle))) {
@@ -246,9 +257,10 @@ class Upload extends Base
                     $fileExt = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
                     $className = isset(self::$extClaseArr[$fileExt]) ? self::$extClaseArr[$fileExt] : 'default-small';
                 }
-                $path3 = $pathName . "/" . $filename;
+                $path3 = $pathName . '/' . $filename;
                 $url = $baseUrl . $path3;
-                $path3 = substr($path3, 0, 1) === '/' ?  substr($path3, 1) : $path3;
+                $path3 = trim($path3, DIRECTORY_SEPARATOR);
+                $path3 = str_replace('\\', "/", $path3);
                 $files[] = array(
                     "path" => $path3,
                     "filename" => $filename,
@@ -267,10 +279,10 @@ class Upload extends Base
     /**
      * 检查目录是否可写
      * @access protected
-     * @param  string   $path    目录
+     * @param  string $path 目录
      * @return boolean
      */
-    private static  function checkPath($path)
+    private static function checkPath($path)
     {
         if (is_dir($path)) {
             return true;
