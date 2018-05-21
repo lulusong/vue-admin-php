@@ -258,9 +258,9 @@ class Upload extends Base
                     $className = isset(self::$extClaseArr[$fileExt]) ? self::$extClaseArr[$fileExt] : 'default-small';
                 }
                 $path3 = $pathName . '/' . $filename;
-                $url = $baseUrl . $path3;
                 $path3 = trim($path3, DIRECTORY_SEPARATOR);
                 $path3 = str_replace('\\', "/", $path3);
+                $url = $baseUrl . $path3;
                 $files[] = array(
                     "path" => $path3,
                     "filename" => $filename,
