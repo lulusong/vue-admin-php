@@ -32,7 +32,7 @@ class Upload extends Base
      * 获取上传文件的根路径
      */
     private static function getBasePath(){
-        return Env::get('root_path') . 'public' . DIRECTORY_SEPARATOR . 'uploads'. DIRECTORY_SEPARATOR;
+        return Env::get('root_path') . 'public' . DIRECTORY_SEPARATOR . 'uploads'. DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR;
     }
 
     public function newDir() {
@@ -191,6 +191,15 @@ class Upload extends Base
         $size = request()->get('size/d',20);
         $page = request()->get('page/d',1);
         $basePath = self::getBasePath();
+
+        // 检查资源文件是否存在
+        if (!self::checkPath($basePath)) {
+            $res = [];
+            $res['errcode'] = ErrorCode::$DATA_NOT;
+            $res['errmsg'] = '目录不存在~';
+            return json($res);
+        }
+
         /* 获取文件列表 */
         $files = self::getFiles($basePath, $pathName, $baseUrl);
         /* 获取指定范围的列表 */
@@ -253,6 +262,23 @@ class Upload extends Base
             }
         }
         return $files;
+    }
+
+    /**
+     * 检查目录是否可写
+     * @access protected
+     * @param  string   $path    目录
+     * @return boolean
+     */
+    private static  function checkPath($path)
+    {
+        if (is_dir($path)) {
+            return true;
+        }
+        if (mkdir($path, 0755, true)) {
+            return true;
+        }
+        return false;
     }
 
 }
