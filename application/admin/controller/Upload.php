@@ -197,6 +197,8 @@ class Upload extends Base
         $pathName = trim($pathName, '/'); // 去掉最前或者最后的 /
         $pathName = trim($pathName, '\\'); // 去掉最前或者最后的 \
         $pathName = self::$RESOURCES_PATH . $pathName;
+        $pathName = trim($pathName, '/'); // 去掉最前或者最后的 /
+        $pathName = trim($pathName, '\\'); // 去掉最前或者最后的 \
         $baseUrl = get_asset_upload_path();
         /* 获取参数 */
         $size = request()->get('size/d', 20);
