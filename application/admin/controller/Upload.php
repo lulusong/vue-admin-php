@@ -44,9 +44,9 @@ class Upload extends Base
         // 创建目录
         $pathName = request()->post("pathName");
         $basePath = self::getBasePath();
+        $pathName = self::$RESOURCES_PATH . $pathName;
         $pathName = trim($pathName, '/'); // 去掉最前或者最后的 /
         $pathName = trim($pathName, '\\'); // 去掉最前或者最后的 \
-        $pathName = self::$RESOURCES_PATH . $pathName;
         $dirname = $basePath . $pathName;
         $dirname = str_replace(' ', '', $dirname);
         if (!file_exists($dirname)) {
