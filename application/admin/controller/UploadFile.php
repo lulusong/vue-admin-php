@@ -8,11 +8,11 @@ use think\facade\Env;
 use think\File;
 
 /**
- * 上传相关
- * Class Upload
+ * 上传文件（管理文件的）
+ * Class UploadFile
  * @package app\admin\controller
  */
-class Upload extends Base
+class UploadFile extends Base
 {
     /**
      * 文件对应的class name
