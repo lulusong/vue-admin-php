@@ -128,3 +128,30 @@ CREATE TABLE `lmx_role_admin` (
   KEY `group_id` (`role_id`),
   KEY `admin_id` (`admin_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='用户角色对应表';
+
+-- ----------------------------
+-- Table structure for lmx_file_resource
+-- ----------------------------
+DROP TABLE IF EXISTS `lmx_file_resource`;
+CREATE TABLE `lmx_file_resource` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '资源id',
+  `tag_id` int(11) DEFAULT '0' COMMENT '资源分组id',
+  `type` tinyint(4) DEFAULT '0' COMMENT '资源的类型（0：图片）',
+  `filename` varchar(255) DEFAULT NULL COMMENT '资源的原名',
+  `path` varchar(255) DEFAULT NULL COMMENT '资源的路径（不加 域名的地址）',
+  `size` int(11) DEFAULT '0' COMMENT '大小',
+  `ext` varchar(10) DEFAULT NULL COMMENT '资源的文件后缀',
+  `create_time` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='资源表';
+
+-- ----------------------------
+-- Table structure for lmx_file_resource_tag
+-- ----------------------------
+DROP TABLE IF EXISTS `lmx_file_resource_tag`;
+CREATE TABLE `lmx_file_resource_tag` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '资源分组的id',
+  `tag` varchar(255) DEFAULT NULL COMMENT '资源分组的tag',
+  `create_time` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='资源的分组表';
