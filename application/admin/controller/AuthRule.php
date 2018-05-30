@@ -2,9 +2,11 @@
 
 namespace app\admin\controller;
 
-use app\admin\model\ErrorCode;
+use app\admin\exception\AdminJsonException;
+use app\common\enums\ErrorCode;
 use app\common\model\AuthAccess;
 use \app\common\model\AuthRule as AuthRuleModel;
+use app\common\vo\ResultVo;
 
 /**
  * 权限相关
@@ -35,7 +37,7 @@ class AuthRule extends BaseCheckUser
         $tree_list = AuthRuleModel::cateTree($lists,'id','pid',0);
         $res['merge_list'] = $merge_list;
         $res['tree_list'] = $tree_list;
-        return json($res);
+        return json(ResultVo::success($res));
 
     }
 
@@ -45,10 +47,7 @@ class AuthRule extends BaseCheckUser
     public function save(){
         $data = $this->request->post();
         if (empty($data['name']) || empty($data['status'])){
-            $res = [];
-            $res['errcode'] = ErrorCode::$HTTP_METHOD_NOT_ALLOWED;
-            $res['errmsg'] = 'Method Not Allowed';
-            return json($res);
+            throw new AdminJsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
         $name = strtolower(strip_tags($data['name']));
         // 菜单模型
@@ -56,10 +55,7 @@ class AuthRule extends BaseCheckUser
             ->field('name')
             ->find();
         if ($info){
-            $res = [];
-            $res['errcode'] = ErrorCode::$DATA_REPEAT;
-            $res['errmsg'] = '权限已经存在';
-            return json($res);
+            throw new AdminJsonException(ErrorCode::DATA_REPEAT, "权限已经存在");
         }
 
         $now_time = time();
@@ -70,10 +66,7 @@ class AuthRule extends BaseCheckUser
                 ->field('id')
                 ->find();
             if (!$info){
-                $res = [];
-                $res['errcode'] = ErrorCode::$NOT_NETWORK;
-                $res['errmsg'] = '网络繁忙';
-                return json($res);
+                throw new AdminJsonException(ErrorCode::NOT_NETWORK);
             }
         }
         $AuthRuleModel = new AuthRuleModel();
@@ -88,10 +81,7 @@ class AuthRule extends BaseCheckUser
         $result = $AuthRuleModel->save();
 
         if (!$result){
-            $res = [];
-            $res['errcode'] = ErrorCode::$NOT_NETWORK;
-            $res['errmsg'] = '网络繁忙！';
-            return json($res);
+            throw new AdminJsonException(ErrorCode::NOT_NETWORK);
         }
 
         $res['id'] = $AuthRuleModel->getLastInsID();
@@ -104,7 +94,7 @@ class AuthRule extends BaseCheckUser
         $res['create_time'] = $AuthRuleModel->create_time;
         $res['update_time'] = $AuthRuleModel->update_time;
 
-        return json($res);
+        return json(ResultVo::success($res));
     }
 
     /**
@@ -113,10 +103,7 @@ class AuthRule extends BaseCheckUser
     public function edit(){
         $data = $this->request->post();
         if (empty($data['id']) || empty($data['name'])){
-            $res = [];
-            $res['errcode'] = ErrorCode::$HTTP_METHOD_NOT_ALLOWED;
-            $res['errmsg'] = 'Method Not Allowed';
-            return json($res);
+            throw new AdminJsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
         $id = $data['id'];
         $name = strtolower(strip_tags($data['name']));
@@ -125,10 +112,7 @@ class AuthRule extends BaseCheckUser
             ->field('id')
             ->find();
         if (!$AuthRuleModel){
-            $res = [];
-            $res['errcode'] = ErrorCode::$DATA_NOT;
-            $res['errmsg'] = '角色不存在';
-            return json($res);
+            throw new AdminJsonException(ErrorCode::DATA_NOT, "角色不存在");
         }
 
         $idInfo = AuthRuleModel::where('name',$name)
@@ -136,10 +120,7 @@ class AuthRule extends BaseCheckUser
             ->find();
         // 判断名称 是否重名，剔除自己
         if (!empty($idInfo['id']) && $idInfo['id'] != $id){
-            $res = [];
-            $res['errcode'] = ErrorCode::$DATA_REPEAT;
-            $res['errmsg'] = '权限名称已存在';
-            return json($res);
+            throw new AdminJsonException(ErrorCode::DATA_REPEAT, "权限名称已存在");
         }
 
         $pid = isset($data['pid']) ? $data['pid'] : 0;
@@ -149,20 +130,14 @@ class AuthRule extends BaseCheckUser
                 ->field('id')
                 ->find();
             if (!$info){
-                $res = [];
-                $res['errcode'] = ErrorCode::$NOT_NETWORK;
-                $res['errmsg'] = '网络繁忙';
-                return json($res);
+                throw new AdminJsonException(ErrorCode::NOT_NETWORK);
             }
         }
         $AuthRuleList = AuthRuleModel::all();
         // 查找当前选择的父级的所有上级
         $parents = AuthRuleModel::queryParentAll($AuthRuleList,'id','pid',$pid);
         if (in_array($id,$parents)){
-            $res = [];
-            $res['errcode'] = ErrorCode::$NOT_NETWORK;
-            $res['errmsg'] = '不能把自身/子级作为父级';
-            return json($res);
+            throw new AdminJsonException(ErrorCode::NOT_NETWORK, "不能把自身/子级作为父级");
         }
 
         $status = isset($data['status']) ? $data['status'] : 0;
@@ -176,14 +151,10 @@ class AuthRule extends BaseCheckUser
         $result = $AuthRuleModel->save();
 
         if (!$result){
-            $res = [];
-            $res['errcode'] = ErrorCode::$DATA_CHANGE;
-            $res['errmsg'] = '数据没有任何更改';
-            return json($res);
+            throw new AdminJsonException(ErrorCode::DATA_CHANGE);
         }
 
-
-        return 'SUCCESS';
+        return json(ResultVo::success("SUCCESS"));
     }
 
 
@@ -193,32 +164,23 @@ class AuthRule extends BaseCheckUser
     public function delete(){
         $id = request()->post('id/d');
         if (empty($id)){
-            $res = [];
-            $res['errcode'] = ErrorCode::$HTTP_METHOD_NOT_ALLOWED;
-            $res['errmsg'] = 'Method Not Allowed';
-            return json($res);
+            throw new AdminJsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
 
         // 下面有子节点，不能删除
         $sub = AuthRuleModel::where('pid',$id)->field('id')->find();
         if ($sub){
-            $res = [];
-            $res['errcode'] = ErrorCode::$NOT_NETWORK;
-            $res['errmsg'] = '网络繁忙！';
-            return json($res);
+            throw new AdminJsonException(ErrorCode::NOT_NETWORK);
         }
 
         if (!AuthRuleModel::where('id',$id)->delete()){
-            $res = [];
-            $res['errcode'] = ErrorCode::$NOT_NETWORK;
-            $res['errmsg'] = '网络繁忙！';
-            return json($res);
+            throw new AdminJsonException(ErrorCode::NOT_NETWORK);
         }
 
         // 删除授权的权限
         AuthAccess::where('auth_rule_id',$id)->delete();
 
-        return 'SUCCESS';
+        return json(ResultVo::success("SUCCESS"));
 
     }
 

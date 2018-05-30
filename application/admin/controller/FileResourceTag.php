@@ -2,7 +2,9 @@
 
 namespace app\admin\controller;
 
-use app\admin\model\ErrorCode;
+use app\admin\exception\AdminJsonException;
+use app\common\enums\ErrorCode;
+use app\common\vo\ResultVo;
 
 /**
  * 资源分组管理
@@ -21,7 +23,7 @@ class FileResourceTag extends Base
         $list = \app\admin\model\FileResourceTag::where($where)
             ->field('id,tag')
             ->select();
-        return json($list);
+        return json(ResultVo::success($list));
     }
 
     /**
@@ -31,10 +33,7 @@ class FileResourceTag extends Base
 
         $tag = request()->post('tag');
         if (empty($tag)){
-            $res = [];
-            $res['errcode'] = ErrorCode::$HTTP_METHOD_NOT_ALLOWED;
-            $res['errmsg'] = 'Method Not Allowed';
-            return json($res);
+            throw new AdminJsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
 
         $ResourceTag = new \app\admin\model\FileResourceTag();
@@ -43,7 +42,7 @@ class FileResourceTag extends Base
         $ResourceTag->save();
         $ResourceTag->id = intval($ResourceTag->id);
         $ResourceTag->create_time = time();
-        return json($ResourceTag);
+        return json(ResultVo::success($ResourceTag));
     }
 
 

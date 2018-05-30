@@ -20,8 +20,6 @@ use think\Model;
 class Admin extends Model
 {
 
-    protected $pk = 'admin_id';
-
     // 缓存的 key
     public static $cache_info = 'admin:id:';
 
@@ -40,9 +38,7 @@ class Admin extends Model
      * @return string
      */
     public static function createToken($uid){
-        $hash_uid = password_hash($uid, PASSWORD_BCRYPT);
-        $data['idss'] = $hash_uid;
-        return base64_encode(json_encode($data)) . '_' . date('Y-m-d');
+        return (base64_encode($uid . time()));
     }
 
     /**

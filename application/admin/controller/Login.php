@@ -2,11 +2,13 @@
 
 namespace app\admin\controller;
 
-use app\admin\model\ErrorCode;
+use app\admin\exception\AdminJsonException;
+use app\common\enums\ErrorCode;
 use app\common\model\Admin;
 use app\common\model\AuthAccess;
 use app\common\model\AuthRule;
 use app\common\model\RoleAdmin;
+use app\common\vo\ResultVo;
 
 /**
  * 登录
@@ -17,41 +19,30 @@ class Login extends Base
     /**
      * 获取用户信息
      * @return \think\response\Json
+     * @throws AdminJsonException
      */
     public function index()
     {
 
         if (!request()->isPost()){
-            $res = [];
-            $res['errcode'] = ErrorCode::$HTTP_METHOD_NOT_ALLOWED;
-            $res['errmsg'] = 'Method Not Allowed';
-            return json($res);
+            throw new AdminJsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
 
         $user_name = request()->post('userName');
         $pwd = request()->post('pwd');
 
         if (!$user_name || !$pwd){
-            $res = [];
-            $res['errcode'] = ErrorCode::$VALIDATION_FAILED;
-            $res['errmsg'] = 'username 不能为空。 password 不能为空。';
-            return json($res);
+            throw new AdminJsonException(ErrorCode::VALIDATION_FAILED, "username 不能为空。 password 不能为空。");
         }
         $admin = Admin::where('username',$user_name)
             ->field('id,username,avatar,password,status')
             ->find();
 
         if (empty($admin) || Admin::getPass($pwd) != $admin->password){
-            $res = [];
-            $res['errcode'] = ErrorCode::$USER_AUTH_FAIL;
-            $res['errmsg'] = '用户名或者密码错误';
-            return json($res);
+            throw new AdminJsonException(ErrorCode::USER_AUTH_FAIL);
         }
         if ($admin->status != 1){
-            $res = [];
-            $res['errcode'] = ErrorCode::$USER_NOT_PERMISSION;
-            $res['errmsg'] = '当前没有权限登录，联系管理员';
-            return json($res);
+            throw new AdminJsonException(ErrorCode::USER_NOT_PERMISSION);
         }
 
         $info = $admin->toArray();
@@ -88,62 +79,52 @@ class Login extends Base
         $res = [];
         $res['id'] = !empty($loginInfo['id']) ? intval($loginInfo['id']) : 0;
         $res['token'] = !empty($loginInfo['token']) ? $loginInfo['token'] : '';
-        return json($res);
+        return json(ResultVo::success($res));
     }
 
     /**
      * 获取登录用户信息
      * @return \think\response\Json
+     * @throws AdminJsonException
      */
     public function userInfo()
     {
         $id = request()->header('X-Adminid');
         $token = request()->header('X-Token');
         if (!$id || !$token) {
-            $res = [];
-            $res['errcode'] = ErrorCode::$LOGIN_FAILED;
-            $res['errmsg'] = '登录失效';
-            return json($res);
+            throw new AdminJsonException(ErrorCode::LOGIN_FAILED);
         }
         $res = Admin::loginInfo($id, (string)$token);
         $res['id'] = !empty($res['id']) ? intval($res['id']) : 0;
         $res['avatar'] = !empty($res['avatar']) ? Admin::getAvatarUrl($res['avatar']) : '';
         // $res['roles'] = ['admin'];
-        return json($res);
+        return json(ResultVo::success($res));
     }
 
     /**
      * 退出
-     * @return \think\response\Json
+     * @return string|\think\response\Json
+     * @throws AdminJsonException
      */
     public function out()
     {
         if (!request()->isPost()){
-            $res = [];
-            $res['errcode'] = ErrorCode::$HTTP_METHOD_NOT_ALLOWED;
-            $res['errmsg'] = 'Method Not Allowed';
-            return json($res);
+            throw new AdminJsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
 
         $id = request()->header('X-Adminid');
         $token = request()->header('X-Token');
         if (!$id || !$token) {
-            $res = [];
-            $res['errcode'] = ErrorCode::$LOGIN_FAILED;
-            $res['errmsg'] = '登录失效';
-            return json($res);
+            throw new AdminJsonException(ErrorCode::LOGIN_FAILED);
         }
         $loginInfo = Admin::loginInfo($id,(string)$token);
         if ($loginInfo == false){
-            $res = [];
-            $res['errcode'] = ErrorCode::$LOGIN_FAILED;
-            $res['errmsg'] = '登录失效';
-            return json($res);
+            throw new AdminJsonException(ErrorCode::LOGIN_FAILED);
         }
 
         Admin::loginOut($id);
 
-        return 'SUCCESS';
+        return json(ResultVo::success("SUCCESS"));
 
     }
 
@@ -153,53 +134,35 @@ class Login extends Base
      */
     public function password(){
         if (!request()->isPost()){
-            $res = [];
-            $res['errcode'] = ErrorCode::$HTTP_METHOD_NOT_ALLOWED;
-            $res['errmsg'] = 'Method Not Allowed';
-            return json($res);
+            throw new AdminJsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
         $id = request()->header('X-Adminid');
         $token = request()->header('X-Token');
         if (!$id || !$token) {
-            $res = [];
-            $res['errcode'] = ErrorCode::$LOGIN_FAILED;
-            $res['errmsg'] = '登录失效';
-            return json($res);
+            throw new AdminJsonException(ErrorCode::LOGIN_FAILED);
         }
         $loginInfo = Admin::loginInfo($id,(string)$token);
         if ($loginInfo == false){
-            $res = [];
-            $res['errcode'] = ErrorCode::$LOGIN_FAILED;
-            $res['errmsg'] = '登录失效';
-            return json($res);
+            throw new AdminJsonException(ErrorCode::LOGIN_FAILED);
         }
         $old_password = request()->post('old_password');
         $new_password = request()->post('new_password');
 
         $admin_info = Admin::where('id',$id)->field('username,password')->find();
         if ($admin_info['password'] != Admin::getPass($old_password)){
-            $res = [];
-            $res['errcode'] = ErrorCode::$USER_AUTH_FAIL;
-            $res['errmsg'] = '原始密码错误';
-            return json($res);
+            throw new AdminJsonException(ErrorCode::USER_AUTH_FAIL, "原始密码错误");
         }
 
         if ($admin_info['password'] == Admin::getPass($new_password)){
-            $res = [];
-            $res['errcode'] = ErrorCode::$USER_AUTH_FAIL;
-            $res['errmsg'] = '密码未做修改';
-            return json($res);
+            throw new AdminJsonException(ErrorCode::USER_AUTH_FAIL, "密码未做修改");
         }
 
         $admin_info->password = Admin::getPass($new_password);
         if (!$admin_info->save()){
-            $res = [];
-            $res['errcode'] = ErrorCode::$NOT_NETWORK;
-            $res['errmsg'] = '网络繁忙！';
-            return json($res);
+            throw new AdminJsonException(ErrorCode::NOT_NETWORK);
         }
 
-        return 'SUCCESS';
+        return json(ResultVo::success("SUCCESS"));
 
     }
 }

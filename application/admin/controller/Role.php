@@ -2,10 +2,12 @@
 
 namespace app\admin\controller;
 
-use app\admin\model\ErrorCode;
+use app\admin\exception\AdminJsonException;
+use app\common\enums\ErrorCode;
 use app\common\model\AuthAccess;
 use app\common\model\AuthRule;
 use \app\common\model\Role as RoleModel;
+use app\common\vo\ResultVo;
 
 /**
  * 角色相关
@@ -36,7 +38,7 @@ class Role extends BaseCheckUser
             ->order($order)
             ->select();
 
-        return json($lists);
+        return json(ResultVo::success($lists));
 
     }
 
@@ -59,16 +61,13 @@ class Role extends BaseCheckUser
             $merge_list = AuthRule::cateMerge($rule_list,'id','pid',0);
             $res['auth_list'] = $merge_list;
             $res['checked_keys'] = $checked_keys;
-            return json($res);
+            return json(ResultVo::success($res));
         }
 
         $data = request()->post();
         $role_id = isset($data['role_id']) ? $data['role_id'] : '';
         if (!$role_id){
-            $res = [];
-            $res['errcode'] = ErrorCode::$NOT_NETWORK;
-            $res['errmsg'] = '网络繁忙！';
-            return json($res);
+            throw new AdminJsonException(ErrorCode::NOT_NETWORK);
         }
         $auth_rules = isset($data['auth_rules']) ? $data['auth_rules'] : [];
         $rule_access = [];
@@ -82,13 +81,10 @@ class Role extends BaseCheckUser
         $AuthAccess = new AuthAccess();
         $AuthAccess->where(['role_id' => $role_id])->delete();
         if (!$rule_access || !$AuthAccess->saveAll($rule_access)){
-            $res = [];
-            $res['errcode'] = ErrorCode::$NOT_NETWORK;
-            $res['errmsg'] = '网络繁忙！';
-            return json($res);
+            throw new AdminJsonException(ErrorCode::NOT_NETWORK);
         }
 
-        return 'SUCCESS';
+        return json(ResultVo::success("SUCCESS"));
 
     }
 
@@ -98,10 +94,7 @@ class Role extends BaseCheckUser
     public function save(){
         $data = request()->post();
         if (empty($data['name']) || empty($data['status'])){
-            $res = [];
-            $res['errcode'] = ErrorCode::$HTTP_METHOD_NOT_ALLOWED;
-            $res['errmsg'] = 'Method Not Allowed';
-            return json($res);
+            throw new AdminJsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
         $name = $data['name'];
         // 菜单模型
@@ -109,10 +102,7 @@ class Role extends BaseCheckUser
             ->field('name')
             ->find();
         if ($info){
-            $res = [];
-            $res['errcode'] = ErrorCode::$DATA_REPEAT;
-            $res['errmsg'] = '角色已存在';
-            return json($res);
+            throw new AdminJsonException(ErrorCode::DATA_REPEAT);
         }
 
         $now_time = time();
@@ -126,10 +116,7 @@ class Role extends BaseCheckUser
         $result = $RoleModel->save();
 
         if (!$result){
-            $res = [];
-            $res['errcode'] = ErrorCode::$NOT_NETWORK;
-            $res['errmsg'] = '网络繁忙！';
-            return json($res);
+            throw new AdminJsonException(ErrorCode::NOT_NETWORK);
         }
 
         $res['id'] = $RoleModel->getLastInsID();
@@ -138,7 +125,7 @@ class Role extends BaseCheckUser
         $res['remark'] = $RoleModel->remark;
         $res['create_time'] = $RoleModel->create_time;
 
-        return json($res);
+        return json(ResultVo::success($res));
     }
 
     /**
@@ -147,10 +134,7 @@ class Role extends BaseCheckUser
     public function edit(){
         $data = request()->post();
         if (empty($data['id']) || empty($data['name'])){
-            $res = [];
-            $res['errcode'] = ErrorCode::$HTTP_METHOD_NOT_ALLOWED;
-            $res['errmsg'] = 'Method Not Allowed';
-            return json($res);
+            throw new AdminJsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
         $id = $data['id'];
         $name = strip_tags($data['name']);
@@ -159,10 +143,7 @@ class Role extends BaseCheckUser
             ->field('id')
             ->find();
         if (!$RoleModel){
-            $res = [];
-            $res['errcode'] = ErrorCode::$DATA_NOT;
-            $res['errmsg'] = '角色不存在';
-            return json($res);
+            throw new AdminJsonException(ErrorCode::DATA_NOT, "角色不存在");
         }
 
         $info = RoleModel::where('name',$name)
@@ -170,10 +151,7 @@ class Role extends BaseCheckUser
             ->find();
         // 判断角色名称 是否重名，剔除自己
         if (!empty($info['id']) && $info['id'] != $id){
-            $res = [];
-            $res['errcode'] = ErrorCode::$DATA_REPEAT;
-            $res['errmsg'] = '角色名称已存在';
-            return json($res);
+            throw new AdminJsonException(ErrorCode::DATA_REPEAT);
         }
 
         $status = isset($data['status']) ? $data['status'] : 0;
@@ -185,14 +163,11 @@ class Role extends BaseCheckUser
         $result = $RoleModel->save();
 
         if (!$result){
-            $res = [];
-            $res['errcode'] = ErrorCode::$DATA_CHANGE;
-            $res['errmsg'] = '数据没有任何更改';
-            return json($res);
+            throw new AdminJsonException(ErrorCode::DATA_CHANGE);
         }
 
 
-        return 'SUCCESS';
+        return json(ResultVo::success("SUCCESS"));
     }
 
 
@@ -202,19 +177,13 @@ class Role extends BaseCheckUser
     public function delete(){
         $id = request()->post('id/d');
         if (empty($id)){
-            $res = [];
-            $res['errcode'] = ErrorCode::$HTTP_METHOD_NOT_ALLOWED;
-            $res['errmsg'] = 'Method Not Allowed';
-            return json($res);
+            throw new AdminJsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
         if (!RoleModel::where('id',$id)->delete()){
-            $res = [];
-            $res['errcode'] = ErrorCode::$NOT_NETWORK;
-            $res['errmsg'] = '网络繁忙！';
-            return json($res);
+            throw new AdminJsonException(ErrorCode::NOT_NETWORK);
         }
 
-        return 'SUCCESS';
+        return json(ResultVo::success("SUCCESS"));
 
     }
 

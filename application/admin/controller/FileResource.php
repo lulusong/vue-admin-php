@@ -2,7 +2,9 @@
 
 namespace app\admin\controller;
 
-use app\admin\model\ErrorCode;
+use app\admin\exception\AdminJsonException;
+use app\common\enums\ErrorCode;
+use app\common\vo\ResultVo;
 use think\File;
 
 /**
@@ -42,7 +44,7 @@ class FileResource extends Base
             $v['create_time'] = strtotime($v['create_time']);
             $lists[$k] = $v;
         }
-        return json($lists);
+        return json(ResultVo::success($lists));
     }
 
     /**
@@ -54,10 +56,7 @@ class FileResource extends Base
          * @var File $uploadFile
          */
         if (!request()->isPost()) {
-            $res = [];
-            $res['errcode'] = ErrorCode::$HTTP_METHOD_NOT_ALLOWED;
-            $res['errmsg'] = 'Method Not Allowed';
-            return json($res);
+            throw new AdminJsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
         $type = request()->param('type/d',0);
         $tag_id = request()->post('tagId/d',0);
@@ -66,11 +65,7 @@ class FileResource extends Base
         $uploadName = request()->param('uploadName');
         $uploadFile = request()->file($uploadName);
         if (empty($uploadFile)) {
-            $res = [];
-            $res['errcode'] = ErrorCode::$DATA_NOT;
-            $res['errmsg'] = '没有文件上传~';
-            $res['ss'] = $uploadName;
-            return json($res);
+            throw new AdminJsonException(ErrorCode::DATA_NOT, "没有文件上传");
         }
 
         $exts = request()->param("exts");
@@ -87,9 +82,7 @@ class FileResource extends Base
         $filepath = $basepath . $resource_path ;
         $info = $uploadFile->validate($config)->move($filepath);
         if (!$info) {
-            $res['errcode'] = ErrorCode::$DATA_NOT;
-            $res['errmsg'] = $uploadFile->getError();
-            return json($res);
+            throw new AdminJsonException(ErrorCode::DATA_NOT, $uploadFile->getError());
         }
         $saveName = $info->getSaveName();
         $path = $resource_path . $saveName;
@@ -106,7 +99,7 @@ class FileResource extends Base
         $Resource->create_time = time();
         $Resource->url = \app\admin\model\FileResource::getUrl($path);
         $Resource->id = intval($Resource->id);
-        return json($Resource);
+        return json(ResultVo::success($Resource));
     }
 
 }
