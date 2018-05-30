@@ -36,7 +36,6 @@ class FileResource extends Model
      * @return string
      */
     public static function getUrl($path){
-        return "http://www.nihuawocai.com/uploads/" . $path;
         return get_asset_upload_path($path);
     }
 
