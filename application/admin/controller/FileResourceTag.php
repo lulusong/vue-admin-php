@@ -39,9 +39,10 @@ class FileResourceTag extends Base
 
         $ResourceTag = new \app\admin\model\FileResourceTag();
         $ResourceTag->tag = $tag;
-        $ResourceTag->create_time = time();
+        $ResourceTag->create_time = date("Y-m-d H:i:s");
         $ResourceTag->save();
         $ResourceTag->id = intval($ResourceTag->id);
+        $ResourceTag->create_time = time();
         return json($ResourceTag);
     }
 
