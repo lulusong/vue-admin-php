@@ -2,7 +2,7 @@
 
 namespace app\admin\controller;
 
-use app\admin\exception\AdminJsonException;
+use app\common\exception\JsonException;
 use app\common\enums\ErrorCode;
 use app\common\model\Admin;
 use app\common\model\AuthAccess;
@@ -19,30 +19,30 @@ class Login extends Base
     /**
      * 获取用户信息
      * @return \think\response\Json
-     * @throws AdminJsonException
+     * @throws JsonException
      */
     public function index()
     {
 
         if (!request()->isPost()){
-            throw new AdminJsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
+            throw new JsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
 
         $user_name = request()->post('userName');
         $pwd = request()->post('pwd');
 
         if (!$user_name || !$pwd){
-            throw new AdminJsonException(ErrorCode::VALIDATION_FAILED, "username 不能为空。 password 不能为空。");
+            throw new JsonException(ErrorCode::VALIDATION_FAILED, "username 不能为空。 password 不能为空。");
         }
         $admin = Admin::where('username',$user_name)
             ->field('id,username,avatar,password,status')
             ->find();
 
         if (empty($admin) || Admin::getPass($pwd) != $admin->password){
-            throw new AdminJsonException(ErrorCode::USER_AUTH_FAIL);
+            throw new JsonException(ErrorCode::USER_AUTH_FAIL);
         }
         if ($admin->status != 1){
-            throw new AdminJsonException(ErrorCode::USER_NOT_PERMISSION);
+            throw new JsonException(ErrorCode::USER_NOT_PERMISSION);
         }
 
         $info = $admin->toArray();
@@ -85,14 +85,14 @@ class Login extends Base
     /**
      * 获取登录用户信息
      * @return \think\response\Json
-     * @throws AdminJsonException
+     * @throws JsonException
      */
     public function userInfo()
     {
         $id = request()->header('X-Adminid');
         $token = request()->header('X-Token');
         if (!$id || !$token) {
-            throw new AdminJsonException(ErrorCode::LOGIN_FAILED);
+            throw new JsonException(ErrorCode::LOGIN_FAILED);
         }
         $res = Admin::loginInfo($id, (string)$token);
         $res['id'] = !empty($res['id']) ? intval($res['id']) : 0;
@@ -104,22 +104,22 @@ class Login extends Base
     /**
      * 退出
      * @return string|\think\response\Json
-     * @throws AdminJsonException
+     * @throws JsonException
      */
     public function out()
     {
         if (!request()->isPost()){
-            throw new AdminJsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
+            throw new JsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
 
         $id = request()->header('X-Adminid');
         $token = request()->header('X-Token');
         if (!$id || !$token) {
-            throw new AdminJsonException(ErrorCode::LOGIN_FAILED);
+            throw new JsonException(ErrorCode::LOGIN_FAILED);
         }
         $loginInfo = Admin::loginInfo($id,(string)$token);
         if ($loginInfo == false){
-            throw new AdminJsonException(ErrorCode::LOGIN_FAILED);
+            throw new JsonException(ErrorCode::LOGIN_FAILED);
         }
 
         Admin::loginOut($id);
@@ -134,32 +134,32 @@ class Login extends Base
      */
     public function password(){
         if (!request()->isPost()){
-            throw new AdminJsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
+            throw new JsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
         $id = request()->header('X-Adminid');
         $token = request()->header('X-Token');
         if (!$id || !$token) {
-            throw new AdminJsonException(ErrorCode::LOGIN_FAILED);
+            throw new JsonException(ErrorCode::LOGIN_FAILED);
         }
         $loginInfo = Admin::loginInfo($id,(string)$token);
         if ($loginInfo == false){
-            throw new AdminJsonException(ErrorCode::LOGIN_FAILED);
+            throw new JsonException(ErrorCode::LOGIN_FAILED);
         }
         $old_password = request()->post('old_password');
         $new_password = request()->post('new_password');
 
         $admin_info = Admin::where('id',$id)->field('username,password')->find();
         if ($admin_info['password'] != Admin::getPass($old_password)){
-            throw new AdminJsonException(ErrorCode::USER_AUTH_FAIL, "原始密码错误");
+            throw new JsonException(ErrorCode::USER_AUTH_FAIL, "原始密码错误");
         }
 
         if ($admin_info['password'] == Admin::getPass($new_password)){
-            throw new AdminJsonException(ErrorCode::USER_AUTH_FAIL, "密码未做修改");
+            throw new JsonException(ErrorCode::USER_AUTH_FAIL, "密码未做修改");
         }
 
         $admin_info->password = Admin::getPass($new_password);
         if (!$admin_info->save()){
-            throw new AdminJsonException(ErrorCode::NOT_NETWORK);
+            throw new JsonException(ErrorCode::NOT_NETWORK);
         }
 
         return json(ResultVo::success("SUCCESS"));

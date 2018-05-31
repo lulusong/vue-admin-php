@@ -2,7 +2,7 @@
 
 namespace app\admin\controller;
 
-use app\admin\exception\AdminJsonException;
+use app\common\exception\JsonException;
 use app\common\enums\ErrorCode;
 use app\common\vo\ResultVo;
 
@@ -33,7 +33,7 @@ class FileResourceTag extends Base
 
         $tag = request()->post('tag');
         if (empty($tag)){
-            throw new AdminJsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
+            throw new JsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
 
         $ResourceTag = new \app\admin\model\FileResourceTag();

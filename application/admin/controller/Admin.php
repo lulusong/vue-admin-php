@@ -2,7 +2,7 @@
 
 namespace app\admin\controller;
 
-use app\admin\exception\AdminJsonException;
+use app\common\exception\JsonException;
 use app\common\enums\ErrorCode;
 use \app\common\model\Admin as AdminModel;
 use app\common\model\Role;
@@ -81,7 +81,7 @@ class Admin extends BaseCheckUser
     public function save(){
         $data = request()->post();
         if (empty($data['username']) || empty($data['password'])){
-            throw new AdminJsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
+            throw new JsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
         $username = $data['username'];
         // 模型
@@ -89,7 +89,7 @@ class Admin extends BaseCheckUser
             ->field('username')
             ->find();
         if ($info){
-            throw new AdminJsonException(ErrorCode::DATA_REPEAT);
+            throw new JsonException(ErrorCode::DATA_REPEAT);
         }
 
         $status = isset($data['status']) ? $data['status'] : 0;
@@ -101,7 +101,7 @@ class Admin extends BaseCheckUser
         $result = $AdminModel->save();
 
         if (!$result){
-            throw new AdminJsonException(ErrorCode::NOT_NETWORK);
+            throw new JsonException(ErrorCode::NOT_NETWORK);
         }
 
         $roles = (isset($data['roles']) && is_array($data['roles'])) ? $data['roles'] : [];
@@ -134,7 +134,7 @@ class Admin extends BaseCheckUser
     public function edit(){
         $data = request()->post();
         if (empty($data['id']) || empty($data['username'])){
-            throw new AdminJsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
+            throw new JsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
         $id = $data['id'];
         $username = strip_tags($data['username']);
@@ -143,13 +143,13 @@ class Admin extends BaseCheckUser
             ->field('id,username')
             ->find();
         if (!$AdminModel){
-            throw new AdminJsonException(ErrorCode::DATA_NOT, "管理员不存在");
+            throw new JsonException(ErrorCode::DATA_NOT, "管理员不存在");
         }
         $loginInfo = $this->adminInfo;
         $loginUserName = isset($loginInfo['username']) ? $loginInfo['username'] : '';
         // 如果是超级管理员，判断当前登录用户是否匹配
         if ($AdminModel->username == 'admin' && $loginUserName != $AdminModel->username){
-            throw new AdminJsonException(ErrorCode::DATA_NOT, "最高权限用户，无权修改");
+            throw new JsonException(ErrorCode::DATA_NOT, "最高权限用户，无权修改");
         }
 
         $info = AdminModel::where('username',$username)
@@ -157,7 +157,7 @@ class Admin extends BaseCheckUser
             ->find();
         // 判断username 是否重名，剔除自己
         if (!empty($info['id']) && $info['id'] != $id){
-            throw new AdminJsonException(ErrorCode::DATA_REPEAT, "管理员已存在");
+            throw new JsonException(ErrorCode::DATA_REPEAT, "管理员已存在");
         }
 
         $status = isset($data['status']) ? $data['status'] : 0;
@@ -179,7 +179,7 @@ class Admin extends BaseCheckUser
             }
             // 没有差值，权限也没做更改
             if ($roles == $temp_roles){
-                throw new AdminJsonException(ErrorCode::DATA_CHANGE);
+                throw new JsonException(ErrorCode::DATA_CHANGE);
             }
         }
 
@@ -206,11 +206,11 @@ class Admin extends BaseCheckUser
     public function delete(){
         $id = request()->post('id/d');
         if (empty($id)){
-            throw new AdminJsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
+            throw new JsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
         $AdminModel = AdminModel::where('id',$id)->field('username')->find();
         if (!$AdminModel || $AdminModel['username'] == 'admin' || !$AdminModel->delete()){
-            throw new AdminJsonException(ErrorCode::NOT_NETWORK);
+            throw new JsonException(ErrorCode::NOT_NETWORK);
         }
         // 删除权限
         RoleAdmin::where('admin_id',$id)->delete();

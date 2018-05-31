@@ -2,7 +2,7 @@
 
 namespace app\admin\controller;
 
-use app\admin\exception\AdminJsonException;
+use app\common\exception\JsonException;
 use app\common\enums\ErrorCode;
 use app\common\model\AuthAccess;
 use \app\common\model\AuthRule as AuthRuleModel;
@@ -47,7 +47,7 @@ class AuthRule extends BaseCheckUser
     public function save(){
         $data = $this->request->post();
         if (empty($data['name']) || empty($data['status'])){
-            throw new AdminJsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
+            throw new JsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
         $name = strtolower(strip_tags($data['name']));
         // 菜单模型
@@ -55,7 +55,7 @@ class AuthRule extends BaseCheckUser
             ->field('name')
             ->find();
         if ($info){
-            throw new AdminJsonException(ErrorCode::DATA_REPEAT, "权限已经存在");
+            throw new JsonException(ErrorCode::DATA_REPEAT, "权限已经存在");
         }
 
         $now_time = time();
@@ -66,7 +66,7 @@ class AuthRule extends BaseCheckUser
                 ->field('id')
                 ->find();
             if (!$info){
-                throw new AdminJsonException(ErrorCode::NOT_NETWORK);
+                throw new JsonException(ErrorCode::NOT_NETWORK);
             }
         }
         $AuthRuleModel = new AuthRuleModel();
@@ -81,7 +81,7 @@ class AuthRule extends BaseCheckUser
         $result = $AuthRuleModel->save();
 
         if (!$result){
-            throw new AdminJsonException(ErrorCode::NOT_NETWORK);
+            throw new JsonException(ErrorCode::NOT_NETWORK);
         }
 
         $res['id'] = $AuthRuleModel->getLastInsID();
@@ -103,7 +103,7 @@ class AuthRule extends BaseCheckUser
     public function edit(){
         $data = $this->request->post();
         if (empty($data['id']) || empty($data['name'])){
-            throw new AdminJsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
+            throw new JsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
         $id = $data['id'];
         $name = strtolower(strip_tags($data['name']));
@@ -112,7 +112,7 @@ class AuthRule extends BaseCheckUser
             ->field('id')
             ->find();
         if (!$AuthRuleModel){
-            throw new AdminJsonException(ErrorCode::DATA_NOT, "角色不存在");
+            throw new JsonException(ErrorCode::DATA_NOT, "角色不存在");
         }
 
         $idInfo = AuthRuleModel::where('name',$name)
@@ -120,7 +120,7 @@ class AuthRule extends BaseCheckUser
             ->find();
         // 判断名称 是否重名，剔除自己
         if (!empty($idInfo['id']) && $idInfo['id'] != $id){
-            throw new AdminJsonException(ErrorCode::DATA_REPEAT, "权限名称已存在");
+            throw new JsonException(ErrorCode::DATA_REPEAT, "权限名称已存在");
         }
 
         $pid = isset($data['pid']) ? $data['pid'] : 0;
@@ -130,14 +130,14 @@ class AuthRule extends BaseCheckUser
                 ->field('id')
                 ->find();
             if (!$info){
-                throw new AdminJsonException(ErrorCode::NOT_NETWORK);
+                throw new JsonException(ErrorCode::NOT_NETWORK);
             }
         }
         $AuthRuleList = AuthRuleModel::all();
         // 查找当前选择的父级的所有上级
         $parents = AuthRuleModel::queryParentAll($AuthRuleList,'id','pid',$pid);
         if (in_array($id,$parents)){
-            throw new AdminJsonException(ErrorCode::NOT_NETWORK, "不能把自身/子级作为父级");
+            throw new JsonException(ErrorCode::NOT_NETWORK, "不能把自身/子级作为父级");
         }
 
         $status = isset($data['status']) ? $data['status'] : 0;
@@ -151,7 +151,7 @@ class AuthRule extends BaseCheckUser
         $result = $AuthRuleModel->save();
 
         if (!$result){
-            throw new AdminJsonException(ErrorCode::DATA_CHANGE);
+            throw new JsonException(ErrorCode::DATA_CHANGE);
         }
 
         return json(ResultVo::success("SUCCESS"));
@@ -164,17 +164,17 @@ class AuthRule extends BaseCheckUser
     public function delete(){
         $id = request()->post('id/d');
         if (empty($id)){
-            throw new AdminJsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
+            throw new JsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
 
         // 下面有子节点，不能删除
         $sub = AuthRuleModel::where('pid',$id)->field('id')->find();
         if ($sub){
-            throw new AdminJsonException(ErrorCode::NOT_NETWORK);
+            throw new JsonException(ErrorCode::NOT_NETWORK);
         }
 
         if (!AuthRuleModel::where('id',$id)->delete()){
-            throw new AdminJsonException(ErrorCode::NOT_NETWORK);
+            throw new JsonException(ErrorCode::NOT_NETWORK);
         }
 
         // 删除授权的权限

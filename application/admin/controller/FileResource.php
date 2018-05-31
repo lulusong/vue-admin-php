@@ -2,7 +2,7 @@
 
 namespace app\admin\controller;
 
-use app\admin\exception\AdminJsonException;
+use app\common\exception\JsonException;
 use app\common\enums\ErrorCode;
 use app\common\vo\ResultVo;
 use think\File;
@@ -56,7 +56,7 @@ class FileResource extends Base
          * @var File $uploadFile
          */
         if (!request()->isPost()) {
-            throw new AdminJsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
+            throw new JsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
         $type = request()->param('type/d',0);
         $tag_id = request()->post('tagId/d',0);
@@ -65,7 +65,7 @@ class FileResource extends Base
         $uploadName = request()->param('uploadName');
         $uploadFile = request()->file($uploadName);
         if (empty($uploadFile)) {
-            throw new AdminJsonException(ErrorCode::DATA_NOT, "没有文件上传");
+            throw new JsonException(ErrorCode::DATA_NOT, "没有文件上传");
         }
 
         $exts = request()->param("exts");
@@ -82,7 +82,7 @@ class FileResource extends Base
         $filepath = $basepath . $resource_path ;
         $info = $uploadFile->validate($config)->move($filepath);
         if (!$info) {
-            throw new AdminJsonException(ErrorCode::DATA_NOT, $uploadFile->getError());
+            throw new JsonException(ErrorCode::DATA_NOT, $uploadFile->getError());
         }
         $saveName = $info->getSaveName();
         $path = $resource_path . $saveName;

@@ -2,7 +2,7 @@
 
 namespace app\common\exception;
 
-use app\admin\exception\AdminJsonException;
+use app\common\exception\JsonException;
 use app\common\enums\ErrorCode;
 use app\common\vo\ResultVo;
 use Exception;
@@ -33,7 +33,7 @@ class GlobalHandle extends Handle
 
         // 自定义的错误处理
         // admin 模块的异常
-        if ($e instanceof AdminJsonException) {
+        if ($e instanceof JsonException) {
             return json(ResultVo::error($e->getCode(), $e->getMessage()));
         }
 

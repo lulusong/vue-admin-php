@@ -8,7 +8,7 @@
 
 namespace app\admin\behavior;
 
-use app\admin\exception\AdminJsonException;
+use app\common\exception\JsonException;
 use app\common\enums\ErrorCode;
 use app\common\model\Admin;
 use think\Request;
@@ -27,11 +27,11 @@ class CheckAuth
         $id = request()->header('X-Adminid');
         $token = request()->header('X-Token');
         if (!$id || !$token) {
-            throw new AdminJsonException(ErrorCode::LOGIN_FAILED);
+            throw new JsonException(ErrorCode::LOGIN_FAILED);
         }
         $loginInfo = Admin::loginInfo($id, (string)$token);
         if ($loginInfo == false) {
-            throw new AdminJsonException(ErrorCode::LOGIN_FAILED);
+            throw new JsonException(ErrorCode::LOGIN_FAILED);
         }
         // 排除权限
         $not_check = [];
@@ -45,7 +45,7 @@ class CheckAuth
         if (!in_array(strtolower($rule_name), $not_check) && (empty($loginInfo['username']) || $loginInfo['username'] != 'admin')) {
             $auth_rule_names = isset($loginInfo['authRules']) && is_array($loginInfo['authRules']) ? $loginInfo['authRules'] : [];
             if (!self::check($loginInfo, $auth_rule_names, [$rule_name],'and')){
-                throw new AdminJsonException(ErrorCode::AUTH_FAILED);
+                throw new JsonException(ErrorCode::AUTH_FAILED);
             }
         }
     }

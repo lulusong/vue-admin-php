@@ -1,6 +1,6 @@
 <?php
 
-namespace app\admin\exception;
+namespace app\common\exception;
 
 use think\Exception;
 
@@ -8,7 +8,7 @@ use think\Exception;
  * admin 模块需要返回 Json 格式的错误异常
  * Class AdminException
  */
-class AdminJsonException extends Exception
+class JsonException extends Exception
 {
 
     public function __construct($errcode, $errmsg = null)
