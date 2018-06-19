@@ -4,14 +4,14 @@ namespace app\admin\controller;
 
 use app\common\exception\JsonException;
 use app\common\enums\ErrorCode;
-use app\common\model\AuthAccess;
-use \app\common\model\AuthRule as AuthRuleModel;
+use app\common\model\AuthPermission;
+use \app\common\model\AuthPermissionRule;
 use app\common\vo\ResultVo;
 
 /**
  * 权限相关
  */
-class AuthRule extends BaseCheckUser
+class AuthPermissionRuleController extends BaseCheckUser
 {
 
     /**
@@ -32,12 +32,12 @@ class AuthRule extends BaseCheckUser
             $where[] = ['name','like',$name . '%'];
             $order = '';
         }
-        $lists = AuthRuleModel::getLists($where,$order);
-        $merge_list = AuthRuleModel::cateMerge($lists,'id','pid',0);
-        $tree_list = AuthRuleModel::cateTree($lists,'id','pid',0);
+        $lists = AuthPermissionRule::getLists($where,$order);
+        $merge_list = AuthPermissionRule::cateMerge($lists,'id','pid',0);
+        $tree_list = AuthPermissionRule::cateTree($lists,'id','pid',0);
         $res['merge_list'] = $merge_list;
         $res['tree_list'] = $tree_list;
-        return json(ResultVo::success($res));
+        return ResultVo::success($res);
 
     }
 
@@ -51,7 +51,7 @@ class AuthRule extends BaseCheckUser
         }
         $name = strtolower(strip_tags($data['name']));
         // 菜单模型
-        $info = AuthRuleModel::where('name',$name)
+        $info = AuthPermissionRule::where('name',$name)
             ->field('name')
             ->find();
         if ($info){
@@ -62,39 +62,39 @@ class AuthRule extends BaseCheckUser
         $status = isset($data['status']) ? $data['status'] : 0;
         $pid = isset($data['pid']) ? $data['pid'] : 0;
         if ($pid){
-            $info = AuthRuleModel::where('id',$pid)
+            $info = AuthPermissionRule::where('id',$pid)
                 ->field('id')
                 ->find();
             if (!$info){
                 throw new JsonException(ErrorCode::NOT_NETWORK);
             }
         }
-        $AuthRuleModel = new AuthRuleModel();
-        $AuthRuleModel->pid = $pid;
-        $AuthRuleModel->name = $name;
-        $AuthRuleModel->title = isset($data['title']) ? $data['title'] : '';
-        $AuthRuleModel->status = $status;
-        $AuthRuleModel->condition = isset($data['condition']) ? $data['condition'] : '';
-        $AuthRuleModel->listorder = isset($data['listorder']) ? strip_tags($data['listorder']) : 0;
-        $AuthRuleModel->create_time = $now_time;
-        $AuthRuleModel->update_time = $now_time;
-        $result = $AuthRuleModel->save();
+        $auth_permission_rule = new AuthPermissionRule();
+        $auth_permission_rule->pid = $pid;
+        $auth_permission_rule->name = $name;
+        $auth_permission_rule->title = isset($data['title']) ? $data['title'] : '';
+        $auth_permission_rule->status = $status;
+        $auth_permission_rule->condition = isset($data['condition']) ? $data['condition'] : '';
+        $auth_permission_rule->listorder = isset($data['listorder']) ? strip_tags($data['listorder']) : 0;
+        $auth_permission_rule->create_time = $now_time;
+        $auth_permission_rule->update_time = $now_time;
+        $result = $auth_permission_rule->save();
 
         if (!$result){
             throw new JsonException(ErrorCode::NOT_NETWORK);
         }
 
-        $res['id'] = $AuthRuleModel->getLastInsID();
-        $res['pid'] = $AuthRuleModel->pid;
-        $res['name'] = $AuthRuleModel->name;
-        $res['title'] = $AuthRuleModel->title;
-        $res['status'] = $AuthRuleModel->status;
-        $res['condition'] = $AuthRuleModel->condition;
-        $res['listorder'] = $AuthRuleModel->listorder;
-        $res['create_time'] = $AuthRuleModel->create_time;
-        $res['update_time'] = $AuthRuleModel->update_time;
+        $res['id'] = $auth_permission_rule->getLastInsID();
+        $res['pid'] = $auth_permission_rule->pid;
+        $res['name'] = $auth_permission_rule->name;
+        $res['title'] = $auth_permission_rule->title;
+        $res['status'] = $auth_permission_rule->status;
+        $res['condition'] = $auth_permission_rule->condition;
+        $res['listorder'] = $auth_permission_rule->listorder;
+        $res['create_time'] = $auth_permission_rule->create_time;
+        $res['update_time'] = $auth_permission_rule->update_time;
 
-        return json(ResultVo::success($res));
+        return ResultVo::success($res);
     }
 
     /**
@@ -108,14 +108,14 @@ class AuthRule extends BaseCheckUser
         $id = $data['id'];
         $name = strtolower(strip_tags($data['name']));
         // 模型
-        $AuthRuleModel = AuthRuleModel::where('id',$id)
+        $auth_permission_rule = AuthPermissionRule::where('id',$id)
             ->field('id')
             ->find();
-        if (!$AuthRuleModel){
+        if (!$auth_permission_rule){
             throw new JsonException(ErrorCode::DATA_NOT, "角色不存在");
         }
 
-        $idInfo = AuthRuleModel::where('name',$name)
+        $idInfo = AuthPermissionRule::where('name',$name)
             ->field('id')
             ->find();
         // 判断名称 是否重名，剔除自己
@@ -126,35 +126,35 @@ class AuthRule extends BaseCheckUser
         $pid = isset($data['pid']) ? $data['pid'] : 0;
         // 判断父级是否存在
         if ($pid){
-            $info = AuthRuleModel::where('id',$pid)
+            $info = AuthPermissionRule::where('id',$pid)
                 ->field('id')
                 ->find();
             if (!$info){
                 throw new JsonException(ErrorCode::NOT_NETWORK);
             }
         }
-        $AuthRuleList = AuthRuleModel::all();
+        $AuthRuleList = AuthPermissionRule::all();
         // 查找当前选择的父级的所有上级
-        $parents = AuthRuleModel::queryParentAll($AuthRuleList,'id','pid',$pid);
+        $parents = AuthPermissionRule::queryParentAll($AuthRuleList,'id','pid',$pid);
         if (in_array($id,$parents)){
             throw new JsonException(ErrorCode::NOT_NETWORK, "不能把自身/子级作为父级");
         }
 
         $status = isset($data['status']) ? $data['status'] : 0;
-        $AuthRuleModel->pid = $pid;
-        $AuthRuleModel->name = $name;
-        $AuthRuleModel->title = isset($data['title']) ? $data['title'] : '';
-        $AuthRuleModel->status = $status;
-        $AuthRuleModel->condition = isset($data['condition']) ? $data['condition'] : '';
-        $AuthRuleModel->listorder = isset($data['listorder']) ? strip_tags($data['listorder']) : 0;
-        $AuthRuleModel->update_time = time();
-        $result = $AuthRuleModel->save();
+        $auth_permission_rule->pid = $pid;
+        $auth_permission_rule->name = $name;
+        $auth_permission_rule->title = isset($data['title']) ? $data['title'] : '';
+        $auth_permission_rule->status = $status;
+        $auth_permission_rule->condition = isset($data['condition']) ? $data['condition'] : '';
+        $auth_permission_rule->listorder = isset($data['listorder']) ? strip_tags($data['listorder']) : 0;
+        $auth_permission_rule->update_time = time();
+        $result = $auth_permission_rule->save();
 
         if (!$result){
             throw new JsonException(ErrorCode::DATA_CHANGE);
         }
 
-        return json(ResultVo::success("SUCCESS"));
+        return ResultVo::success("SUCCESS");
     }
 
 
@@ -168,19 +168,19 @@ class AuthRule extends BaseCheckUser
         }
 
         // 下面有子节点，不能删除
-        $sub = AuthRuleModel::where('pid',$id)->field('id')->find();
+        $sub = AuthPermissionRule::where('pid',$id)->field('id')->find();
         if ($sub){
             throw new JsonException(ErrorCode::NOT_NETWORK);
         }
 
-        if (!AuthRuleModel::where('id',$id)->delete()){
+        if (!AuthPermissionRule::where('id',$id)->delete()){
             throw new JsonException(ErrorCode::NOT_NETWORK);
         }
 
         // 删除授权的权限
-        AuthAccess::where('auth_rule_id',$id)->delete();
+        AuthPermission::where('permission_rule_id',$id)->delete();
 
-        return json(ResultVo::success("SUCCESS"));
+        return ResultVo::success("SUCCESS");
 
     }
 

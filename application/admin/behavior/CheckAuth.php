@@ -10,7 +10,8 @@ namespace app\admin\behavior;
 
 use app\common\exception\JsonException;
 use app\common\enums\ErrorCode;
-use app\common\model\Admin;
+use app\common\model\AuthAdmin;
+use app\common\model\AuthPermissionRule;
 use think\Request;
 
 /**
@@ -29,7 +30,7 @@ class CheckAuth
         if (!$id || !$token) {
             throw new JsonException(ErrorCode::LOGIN_FAILED);
         }
-        $loginInfo = Admin::loginInfo($id, (string)$token);
+        $loginInfo = AuthAdmin::loginInfo($id, (string)$token);
         if ($loginInfo == false) {
             throw new JsonException(ErrorCode::LOGIN_FAILED);
         }
@@ -72,12 +73,12 @@ class CheckAuth
                 $name = array($name);
             }
         }
-        $auth_rule_list = AuthRule::where('name','in',$auth_rule_names)
+        $auth_permission_rule_list = AuthPermissionRule::where('name','in',$auth_rule_names)
             ->field('id,name,condition')
             ->select();
 
         $list = [];
-        foreach ($auth_rule_list as $rule){
+        foreach ($auth_permission_rule_list as $rule){
             if (!empty($rule['condition'])) { //根据condition进行验证
                 $admin = $admin; // $admin 不能删除，下面正则会用到
                 $command = preg_replace('/\{(\w*?)\}/', '$admin[\'\\1\']', $rule['condition']);

@@ -14,9 +14,9 @@ namespace app\common\model;
 use think\Model;
 
 /**
- * 权限授权表
+ * 角色表
  */
-class AuthAccess extends Model
+class AuthRole extends Model
 {
 
 //    protected $pk = 'id';

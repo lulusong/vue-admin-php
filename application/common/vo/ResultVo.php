@@ -9,13 +9,13 @@ class ResultVo
      * 错误码
      * @var
      */
-    public $errcode;
+    public $code;
 
     /**
      * 错误信息
      * @var
      */
-    public $errmsg;
+    public $message;
 
     /**
      * 返回的data
@@ -23,44 +23,38 @@ class ResultVo
      */
     public $data;
 
-    private function __construct($errcode, $errmsg, $data)
+    private function __construct($code, $message, $data)
     {
-        $this->errcode = $errcode;
-        $this->errmsg = $errmsg;
+        $this->code = $code;
+        $this->message = $message;
         $this->data = $data;
     }
 
     /**
      * 请求成功的方法
      * @param $data
-     * @return ResultVo
+     * @return \think\response\Json
      */
     public static function success($data)
     {
-        $instance = new self(null, null, $data);
-        unset($instance->errcode);
-        unset($instance->errmsg);
-        return $instance;
+        return json($data);
     }
 
     /**
      * 请求错误
-     * @param $errcode
-     * @param $errmsg
-     * @param $data
-     * @return ResultVo
+     * @param $code
+     * @param null $message
+     * @param string $data
+     * @return \think\response\Json
      */
-    public static function error($errcode, $errmsg = null, $data = null)
+    public static function error($code, $message = null, $data = '')
     {
-        if (is_array($errcode)) {
-            $errmsg = isset($errcode['message']) && $errmsg == null ? $errcode['message'] : $errmsg;
-            $errcode = isset($errcode['code']) ? $errcode['code'] : null;
+        if (is_array($code)) {
+            $message = isset($code['message']) && $message == null ? $code['message'] : $message;
+            $code = isset($code['code']) ? $code['code'] : null;
         }
-        $instance = new self($errcode, $errmsg, $data);
-        if ($data == null) {
-            unset($instance->data);
-        }
-        return $instance;
+        $instance = new self($code, $message, $data);
+        return json($instance);
     }
 
 }

@@ -17,7 +17,7 @@ use think\Model;
 /**
  * 管理员表
  */
-class Admin extends Model
+class AuthAdmin extends Model
 {
 
     // 缓存的 key

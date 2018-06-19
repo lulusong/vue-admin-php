@@ -4,15 +4,15 @@ namespace app\admin\controller;
 
 use app\common\exception\JsonException;
 use app\common\enums\ErrorCode;
-use app\common\model\AuthAccess;
-use app\common\model\AuthRule;
-use \app\common\model\Role as RoleModel;
+use app\common\model\AuthPermission;
+use app\common\model\AuthPermissionRule;
+use \app\common\model\AuthRole;
 use app\common\vo\ResultVo;
 
 /**
  * 角色相关
  */
-class Role extends BaseCheckUser
+class AuthRoleController extends BaseCheckUser
 {
 
     /**
@@ -33,35 +33,38 @@ class Role extends BaseCheckUser
             $where[] = ['name','like',$name . '%'];
             $order = '';
         }
-        $lists = RoleModel::where($where)
+        $lists = AuthRole::where($where)
             ->field('id,name,status,remark,create_time,listorder')
             ->order($order)
             ->select();
 
-        return json(ResultVo::success($lists));
+        return ResultVo::success($lists);
 
     }
 
+    /*
+     * 授权
+     */
     public function auth(){
         if (request()->isGet()){
             $id = request()->get('id/d','');
-            $auth_access = AuthAccess::where('role_id',$id)
-                ->field(['auth_rule_id'])
+            $auth_permission = AuthPermission::where('role_id',$id)
+                ->field(['permission_rule_id'])
                 ->select();
-            $rule_list = AuthRule::getLists([],'id ASC');
+            $rule_list = AuthPermissionRule::getLists([],'id ASC');
             $checked_keys = [];
             foreach ($rule_list as $key=>$value){
-                foreach ($auth_access as $k=>$v){
-                    if (strtolower($value['id']) == strtolower($v['auth_rule_id'])){
-                        $checked_keys[] = $v['auth_rule_id'];
+                foreach ($auth_permission as $k=>$v){
+                    if (strtolower($value['id']) == strtolower($v['permission_rule_id'])){
+                        $checked_keys[] = $v['permission_rule_id'];
                     }
                 }
             }
 
-            $merge_list = AuthRule::cateMerge($rule_list,'id','pid',0);
+            $merge_list = AuthPermissionRule::cateMerge($rule_list,'id','pid',0);
             $res['auth_list'] = $merge_list;
             $res['checked_keys'] = $checked_keys;
-            return json(ResultVo::success($res));
+            return ResultVo::success($res);
         }
 
         $data = request()->post();
@@ -73,18 +76,18 @@ class Role extends BaseCheckUser
         $rule_access = [];
         foreach ($auth_rules as $key=>$val){
             $rule_access[$key]['role_id'] = $role_id;
-            $rule_access[$key]['auth_rule_id'] = $val;
+            $rule_access[$key]['permission_rule_id'] = $val;
             $rule_access[$key]['type'] = 'admin';
         }
 
         //先删除
-        $AuthAccess = new AuthAccess();
-        $AuthAccess->where(['role_id' => $role_id])->delete();
-        if (!$rule_access || !$AuthAccess->saveAll($rule_access)){
+        $auth_permission = new AuthPermission();
+        $auth_permission->where(['role_id' => $role_id])->delete();
+        if (!$rule_access || !$auth_permission->saveAll($rule_access)){
             throw new JsonException(ErrorCode::NOT_NETWORK);
         }
 
-        return json(ResultVo::success("SUCCESS"));
+        return ResultVo::success("SUCCESS");
 
     }
 
@@ -98,7 +101,7 @@ class Role extends BaseCheckUser
         }
         $name = $data['name'];
         // 菜单模型
-        $info = RoleModel::where('name',$name)
+        $info = AuthRole::where('name',$name)
             ->field('name')
             ->find();
         if ($info){
@@ -107,25 +110,25 @@ class Role extends BaseCheckUser
 
         $now_time = time();
         $status = isset($data['status']) ? $data['status'] : 0;
-        $RoleModel = new RoleModel();
-        $RoleModel->name = $name;
-        $RoleModel->status = $status;
-        $RoleModel->remark = isset($data['remark']) ? strip_tags($data['remark']) : '';
-        $RoleModel->create_time = $now_time;
-        $RoleModel->update_time = $now_time;
-        $result = $RoleModel->save();
+        $auth_role = new AuthRole();
+        $auth_role->name = $name;
+        $auth_role->status = $status;
+        $auth_role->remark = isset($data['remark']) ? strip_tags($data['remark']) : '';
+        $auth_role->create_time = $now_time;
+        $auth_role->update_time = $now_time;
+        $result = $auth_role->save();
 
         if (!$result){
             throw new JsonException(ErrorCode::NOT_NETWORK);
         }
 
-        $res['id'] = $RoleModel->getLastInsID();
-        $res['name'] = $RoleModel->name;
-        $res['status'] = $RoleModel->status;
-        $res['remark'] = $RoleModel->remark;
-        $res['create_time'] = $RoleModel->create_time;
+        $res['id'] = $auth_role->getLastInsID();
+        $res['name'] = $auth_role->name;
+        $res['status'] = $auth_role->status;
+        $res['remark'] = $auth_role->remark;
+        $res['create_time'] = $auth_role->create_time;
 
-        return json(ResultVo::success($res));
+        return ResultVo::success($res);
     }
 
     /**
@@ -139,14 +142,14 @@ class Role extends BaseCheckUser
         $id = $data['id'];
         $name = strip_tags($data['name']);
         // 模型
-        $RoleModel = RoleModel::where('id',$id)
+        $auth_role = AuthRole::where('id',$id)
             ->field('id')
             ->find();
-        if (!$RoleModel){
+        if (!$auth_role){
             throw new JsonException(ErrorCode::DATA_NOT, "角色不存在");
         }
 
-        $info = RoleModel::where('name',$name)
+        $info = AuthRole::where('name',$name)
             ->field('id')
             ->find();
         // 判断角色名称 是否重名，剔除自己
@@ -155,19 +158,19 @@ class Role extends BaseCheckUser
         }
 
         $status = isset($data['status']) ? $data['status'] : 0;
-        $RoleModel->name = $name;
-        $RoleModel->status = $status;
-        $RoleModel->remark = isset($data['remark']) ? strip_tags($data['remark']) : '';
-        $RoleModel->update_time = time();
-        $RoleModel->listorder = isset($data['listorder']) ? intval($data['listorder']) : 999;
-        $result = $RoleModel->save();
+        $auth_role->name = $name;
+        $auth_role->status = $status;
+        $auth_role->remark = isset($data['remark']) ? strip_tags($data['remark']) : '';
+        $auth_role->update_time = time();
+        $auth_role->listorder = isset($data['listorder']) ? intval($data['listorder']) : 999;
+        $result = $auth_role->save();
 
         if (!$result){
             throw new JsonException(ErrorCode::DATA_CHANGE);
         }
 
 
-        return json(ResultVo::success("SUCCESS"));
+        return ResultVo::success("SUCCESS");
     }
 
 
@@ -179,11 +182,11 @@ class Role extends BaseCheckUser
         if (empty($id)){
             throw new JsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
-        if (!RoleModel::where('id',$id)->delete()){
+        if (!AuthRole::where('id',$id)->delete()){
             throw new JsonException(ErrorCode::NOT_NETWORK);
         }
 
-        return json(ResultVo::success("SUCCESS"));
+        return ResultVo::success("SUCCESS");
 
     }
 

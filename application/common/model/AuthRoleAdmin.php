@@ -16,7 +16,7 @@ use think\Model;
 /**
  * 用户角色对应表
  */
-class RoleAdmin extends Model
+class AuthRoleAdmin extends Model
 {
 
 //    protected $pk = 'id';

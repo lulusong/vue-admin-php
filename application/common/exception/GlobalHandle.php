@@ -2,7 +2,6 @@
 
 namespace app\common\exception;
 
-use app\common\exception\JsonException;
 use app\common\enums\ErrorCode;
 use app\common\vo\ResultVo;
 use Exception;
@@ -23,18 +22,18 @@ class GlobalHandle extends Handle
     {
         // 参数验证错误
         if ($e instanceof ValidateException) {
-            return json(ResultVo::error(ErrorCode::DATA_VALIDATE_FAIL));
+            return ResultVo::error(ErrorCode::DATA_VALIDATE_FAIL);
         }
 
         // 请求异常
         if ($e instanceof HttpException && request()->isAjax()) {
-            return response($e->getMessage(), $e->getStatusCode());
+            return ResultVo::error(ErrorCode::NOT_NETWORK);
         }
 
         // 自定义的错误处理
         // admin 模块的异常
         if ($e instanceof JsonException) {
-            return json(ResultVo::error($e->getCode(), $e->getMessage()));
+            return ResultVo::error($e->getCode(), $e->getMessage());
         }
 
         // 如果是正式环境，

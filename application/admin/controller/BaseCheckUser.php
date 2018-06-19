@@ -2,7 +2,7 @@
 
 namespace app\admin\controller;
 
-use app\common\model\Admin;
+use app\common\model\AuthAdmin;
 use think\facade\Hook;
 
 /**
@@ -24,8 +24,8 @@ class BaseCheckUser extends Base
 
         $id = request()->header('X-Adminid');
         $token = request()->header('X-Token');
-        $loginInfo = Admin::loginInfo($id, (string)$token);
-        $this->adminInfo = $loginInfo;
+        $login_info = AuthAdmin::loginInfo($id, (string)$token);
+        $this->adminInfo = $login_info;
 
 
     }

@@ -2,6 +2,7 @@
 
 namespace app\admin\controller;
 
+use app\admin\model\FileResource;
 use app\common\exception\JsonException;
 use app\common\enums\ErrorCode;
 use app\common\vo\ResultVo;
@@ -9,10 +10,8 @@ use think\File;
 
 /**
  * 资源管理
- * Class FileResource
- * @package app\admin\controller
  */
-class FileResource extends Base
+class FileResourceController extends Base
 {
 
     /**
@@ -34,17 +33,17 @@ class FileResource extends Base
             'var_page' => 'page',
             'list_rows' => ($size <= 0 || $size > 20) ? 20 : $size,
         ];
-        $Resource = new \app\admin\model\FileResource();
-        $lists = $Resource->where($where)
+        $file_resource = new FileResource();
+        $lists = $file_resource->where($where)
             ->field('id,type,filename,path,size,ext,create_time')
             ->paginate($paginate);
 
         foreach ($lists as $k => $v) {
-            $v['url'] = $Resource::getUrl($v['path']);
+            $v['url'] = $file_resource::getUrl($v['path']);
             $v['create_time'] = strtotime($v['create_time']);
             $lists[$k] = $v;
         }
-        return json(ResultVo::success($lists));
+        return ResultVo::success($lists);
     }
 
     /**
@@ -77,8 +76,8 @@ class FileResource extends Base
         if ($exts) {
             $config['ext'] = $exts;
         }
-        $basepath = \app\admin\model\FileResource::getBasePath();
-        $resource_path = \app\admin\model\FileResource::$RESOURCES_PATH . \app\admin\model\FileResource::getTypePath($type);
+        $basepath = FileResource::getBasePath();
+        $resource_path = FileResource::$RESOURCES_PATH . FileResource::getTypePath($type);
         $filepath = $basepath . $resource_path ;
         $info = $uploadFile->validate($config)->move($filepath);
         if (!$info) {
@@ -87,19 +86,19 @@ class FileResource extends Base
         $saveName = $info->getSaveName();
         $path = $resource_path . $saveName;
         $path = str_replace("\\", "/", $path);
-        $Resource = new \app\admin\model\FileResource();
-        $Resource->tag_id = $tag_id;
-        $Resource->type = $type;
-        $Resource->filename = $uploadFile->getInfo('name');
-        $Resource->path = $path;
-        $Resource->size = $info->getSize();
-        $Resource->ext = $info->getExtension();
-        $Resource->create_time = date("Y-m-d H:i:s");
-        $Resource->save();
-        $Resource->create_time = time();
-        $Resource->url = \app\admin\model\FileResource::getUrl($path);
-        $Resource->id = intval($Resource->id);
-        return json(ResultVo::success($Resource));
+        $file_resource = new FileResource();
+        $file_resource->tag_id = $tag_id;
+        $file_resource->type = $type;
+        $file_resource->filename = $uploadFile->getInfo('name');
+        $file_resource->path = $path;
+        $file_resource->size = $info->getSize();
+        $file_resource->ext = $info->getExtension();
+        $file_resource->create_time = date("Y-m-d H:i:s");
+        $file_resource->save();
+        $file_resource->create_time = time();
+        $file_resource->url = FileResource::getUrl($path);
+        $file_resource->id = intval($file_resource->id);
+        return ResultVo::success($file_resource);
     }
 
 }

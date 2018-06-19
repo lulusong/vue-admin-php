@@ -4,15 +4,15 @@ namespace app\admin\controller;
 
 use app\common\exception\JsonException;
 use app\common\enums\ErrorCode;
-use \app\common\model\Admin as AdminModel;
-use app\common\model\Role;
-use app\common\model\RoleAdmin;
+use app\common\model\AuthAdmin;
+use app\common\model\AuthRole;
+use app\common\model\AuthRoleAdmin;
 use app\common\vo\ResultVo;
 
 /**
  * 管理员相关
  */
-class Admin extends BaseCheckUser
+class AuthAdminController extends BaseCheckUser
 {
 
     /**
@@ -35,7 +35,7 @@ class Admin extends BaseCheckUser
         }
         $role_id = request()->get('role_id/id', '');
         if ($role_id !== ''){
-            $admin_ids = RoleAdmin::where('role_id',$role_id)->column('admin_id');
+            $admin_ids = AuthRoleAdmin::where('role_id',$role_id)->column('admin_id');
             $where[] = ['id','in',$admin_ids];
             $order = '';
         }
@@ -46,14 +46,14 @@ class Admin extends BaseCheckUser
             'var_page' => 'page',
             'list_rows' => ($limit <= 0 || $limit > 20) ? 20 : $limit,
         ];
-        $lists = AdminModel::where($where)
+        $lists = AuthAdmin::where($where)
             ->field('id,username,avatar,tel,email,status,last_login_ip,last_login_time,create_time')
             ->order($order)
             ->paginate($paginate);
 
         foreach ($lists as $k => $v) {
-            $v['avatar'] = AdminModel::getAvatarUrl($v['avatar']);
-            $roles = RoleAdmin::where('admin_id',$v['id'])->field('role_id')->select();
+            $v['avatar'] = AuthAdmin::getAvatarUrl($v['avatar']);
+            $roles = AuthRoleAdmin::where('admin_id',$v['id'])->field('role_id')->select();
             $temp_roles = [];
             if ($roles){
                 $temp_roles = $roles->toArray();
@@ -63,7 +63,7 @@ class Admin extends BaseCheckUser
             $lists[$k] = $v;
         }
 
-        $role_list = Role::where('status',1)
+        $role_list = AuthRole::where('status',1)
             ->field('id,name')
             ->order('id ASC')
             ->select();
@@ -71,7 +71,7 @@ class Admin extends BaseCheckUser
         $res['admin_list'] = $lists;
         $res['role_list'] = $role_list;
 
-        return json(ResultVo::success($res));
+        return ResultVo::success($res);
 
     }
 
@@ -85,7 +85,7 @@ class Admin extends BaseCheckUser
         }
         $username = $data['username'];
         // 模型
-        $info = AdminModel::where('username',$username)
+        $info = AuthAdmin::where('username',$username)
             ->field('username')
             ->find();
         if ($info){
@@ -93,12 +93,12 @@ class Admin extends BaseCheckUser
         }
 
         $status = isset($data['status']) ? $data['status'] : 0;
-        $AdminModel = new AdminModel();
-        $AdminModel->username = $username;
-        $AdminModel->password = AdminModel::getPass($data['password']);
-        $AdminModel->status = $status;
-        $AdminModel->create_time = time();
-        $result = $AdminModel->save();
+        $auth_admin = new AuthAdmin();
+        $auth_admin->username = $username;
+        $auth_admin->password = AuthAdmin::getPass($data['password']);
+        $auth_admin->status = $status;
+        $auth_admin->create_time = time();
+        $result = $auth_admin->save();
 
         if (!$result){
             throw new JsonException(ErrorCode::NOT_NETWORK);
@@ -107,7 +107,7 @@ class Admin extends BaseCheckUser
         $roles = (isset($data['roles']) && is_array($data['roles'])) ? $data['roles'] : [];
 
         //$adminInfo = $this->adminInfo; // 登录用户信息
-        $admin_id = $AdminModel->getLastInsID();
+        $admin_id = $auth_admin->getLastInsID();
         if ($roles){
             $temp = [];
             foreach ($roles as $key => $value){
@@ -115,17 +115,17 @@ class Admin extends BaseCheckUser
                 $temp[$key]['admin_id'] = $admin_id;
             }
             //添加用户的角色
-            $RoleAdmin = new RoleAdmin();
-            $RoleAdmin->saveAll($temp);
+            $auth_role_admin = new AuthRoleAdmin();
+            $auth_role_admin->saveAll($temp);
         }
 
         $res['id'] = $admin_id;
-        $res['username'] = $AdminModel->username;
+        $res['username'] = $auth_admin->username;
         $res['password'] = '';
-        $res['status'] = $AdminModel->status;
+        $res['status'] = $auth_admin->status;
         $res['roles'] = $roles;
 
-        return json(ResultVo::success($res));
+        return ResultVo::success($res);
     }
 
     /**
@@ -139,20 +139,20 @@ class Admin extends BaseCheckUser
         $id = $data['id'];
         $username = strip_tags($data['username']);
         // 模型
-        $AdminModel = AdminModel::where('id',$id)
+        $auth_admin = AuthAdmin::where('id',$id)
             ->field('id,username')
             ->find();
-        if (!$AdminModel){
+        if (!$auth_admin){
             throw new JsonException(ErrorCode::DATA_NOT, "管理员不存在");
         }
-        $loginInfo = $this->adminInfo;
-        $loginUserName = isset($loginInfo['username']) ? $loginInfo['username'] : '';
+        $login_info = $this->adminInfo;
+        $login_user_name = isset($login_info['username']) ? $login_info['username'] : '';
         // 如果是超级管理员，判断当前登录用户是否匹配
-        if ($AdminModel->username == 'admin' && $loginUserName != $AdminModel->username){
+        if ($auth_admin->username == 'admin' && $login_user_name != $auth_admin->username){
             throw new JsonException(ErrorCode::DATA_NOT, "最高权限用户，无权修改");
         }
 
-        $info = AdminModel::where('username',$username)
+        $info = AuthAdmin::where('username',$username)
             ->field('id')
             ->find();
         // 判断username 是否重名，剔除自己
@@ -162,17 +162,17 @@ class Admin extends BaseCheckUser
 
         $status = isset($data['status']) ? $data['status'] : 0;
         $password = isset($data['password']) ? AdminModel::getPass($data['password']) : '';
-        $AdminModel->username = $username;
+        $auth_admin->username = $username;
         if ($password){
-            $AdminModel->password = $password;
+            $auth_admin->password = $password;
         }
-        $AdminModel->status = $status;
-        $result = $AdminModel->save();
+        $auth_admin->status = $status;
+        $result = $auth_admin->save();
 
         $roles = (isset($data['roles']) && is_array($data['roles'])) ? $data['roles'] : [];
         if (!$result){
             // 没有做任何更改
-            $temp_roles = RoleAdmin::where('admin_id',$id)->field('role_id')->select();
+            $temp_roles = AuthRoleAdmin::where('admin_id',$id)->field('role_id')->select();
             if ($temp_roles){
                 $temp_roles = $temp_roles->toArray();
                 $temp_roles = array_column($temp_roles,'role_id');
@@ -186,18 +186,18 @@ class Admin extends BaseCheckUser
 
         if ($roles){
             // 先删除
-            RoleAdmin::where('admin_id',$id)->delete();
+            AuthRoleAdmin::where('admin_id',$id)->delete();
             $temp = [];
             foreach ($roles as $key => $value){
                 $temp[$key]['role_id'] = $value;
                 $temp[$key]['admin_id'] = $id;
             }
             //添加用户的角色
-            $RoleAdmin = new RoleAdmin();
-            $RoleAdmin->saveAll($temp);
+            $auth_role_admin = new AuthRoleAdmin();
+            $auth_role_admin->saveAll($temp);
         }
 
-        return json(ResultVo::success("SUCCESS"));
+        return ResultVo::success("SUCCESS");
     }
 
     /**
@@ -208,14 +208,14 @@ class Admin extends BaseCheckUser
         if (empty($id)){
             throw new JsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
-        $AdminModel = AdminModel::where('id',$id)->field('username')->find();
-        if (!$AdminModel || $AdminModel['username'] == 'admin' || !$AdminModel->delete()){
+        $auth_admin = AuthAdmin::where('id',$id)->field('username')->find();
+        if (!$auth_admin || $auth_admin['username'] == 'admin' || !$auth_admin->delete()){
             throw new JsonException(ErrorCode::NOT_NETWORK);
         }
         // 删除权限
-        RoleAdmin::where('admin_id',$id)->delete();
+        AuthRoleAdmin::where('admin_id',$id)->delete();
 
-        return json(ResultVo::success("SUCCESS"));
+        return ResultVo::success("SUCCESS");
 
     }
 

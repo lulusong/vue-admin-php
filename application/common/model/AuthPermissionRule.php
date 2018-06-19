@@ -16,7 +16,7 @@ use think\Model;
 /**
  * 权限规则表
  */
-class AuthRule extends Model
+class AuthPermissionRule extends Model
 {
 
     //    protected $pk = 'id';

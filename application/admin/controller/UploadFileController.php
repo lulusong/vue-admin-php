@@ -4,6 +4,7 @@ namespace app\admin\controller;
 
 use app\common\exception\JsonException;
 use app\common\enums\ErrorCode;
+use app\common\vo\ResultVo;
 use think\facade\Env;
 use think\File;
 
@@ -12,7 +13,7 @@ use think\File;
  * Class UploadFile
  * @package app\admin\controller
  */
-class UploadFile extends Base
+class UploadFileController extends Base
 {
     /**
      * 文件对应的class name
@@ -87,7 +88,7 @@ class UploadFile extends Base
             "size" => 0
         );
 
-        return json($res);
+        return ResultVo::success($res);
     }
 
     /**
@@ -156,7 +157,7 @@ class UploadFile extends Base
             "fileExt" => $fileExt,
             "size" => $info->getSize()
         );
-        return json($res);
+        return ResultVo::success($res);
     }
 
     /*
@@ -198,7 +199,7 @@ class UploadFile extends Base
         $res['total'] = $len;
         $res['list'] = $list;
         $res['pathName'] = $pathName;
-        return json($res);
+        return ResultVo::success($res);
     }
 
 
