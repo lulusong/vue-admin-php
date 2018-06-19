@@ -39,7 +39,7 @@ class CheckAuth
 
         //检查权限
         $module     = request()->module();
-        $controller = request()->controller();
+        $controller = parse_name(request()->controller());
         $action     = request()->action();
         $rule_name = strtolower($module . '/' . $controller . '/' . $action);
         // 不在排除的权限内，并且 用户不为超级管理员
@@ -76,7 +76,6 @@ class CheckAuth
         $auth_permission_rule_list = AuthPermissionRule::where('name','in',$auth_rule_names)
             ->field('id,name,condition')
             ->select();
-
         $list = [];
         foreach ($auth_permission_rule_list as $rule){
             if (!empty($rule['condition'])) { //根据condition进行验证
