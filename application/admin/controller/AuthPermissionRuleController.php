@@ -72,10 +72,10 @@ class AuthPermissionRuleController extends BaseCheckUser
         $auth_permission_rule = new AuthPermissionRule();
         $auth_permission_rule->pid = $pid;
         $auth_permission_rule->name = $name;
-        $auth_permission_rule->title = isset($data['title']) ? $data['title'] : '';
+        $auth_permission_rule->title = !empty($data['title']) ? $data['title'] : ' ';
         $auth_permission_rule->status = $status;
-        $auth_permission_rule->condition = isset($data['condition']) ? $data['condition'] : '';
-        $auth_permission_rule->listorder = isset($data['listorder']) ? strip_tags($data['listorder']) : 0;
+        $auth_permission_rule->condition = !empty($data['condition']) ? $data['condition'] : ' ';
+        $auth_permission_rule->listorder = !empty($data['listorder']) ? strip_tags($data['listorder']) : 0;
         $auth_permission_rule->create_time = $now_time;
         $auth_permission_rule->update_time = $now_time;
         $result = $auth_permission_rule->save();
@@ -143,10 +143,10 @@ class AuthPermissionRuleController extends BaseCheckUser
         $status = isset($data['status']) ? $data['status'] : 0;
         $auth_permission_rule->pid = $pid;
         $auth_permission_rule->name = $name;
-        $auth_permission_rule->title = isset($data['title']) ? $data['title'] : '';
+        $auth_permission_rule->title = !empty($data['title']) ? $data['title'] : ' ';
         $auth_permission_rule->status = $status;
-        $auth_permission_rule->condition = isset($data['condition']) ? $data['condition'] : '';
-        $auth_permission_rule->listorder = isset($data['listorder']) ? strip_tags($data['listorder']) : 0;
+        $auth_permission_rule->condition = !empty($data['condition']) ? $data['condition'] : ' ';
+        $auth_permission_rule->listorder = !empty($data['listorder']) ? strip_tags($data['listorder']) : 0;
         $auth_permission_rule->update_time = time();
         $result = $auth_permission_rule->save();
 
