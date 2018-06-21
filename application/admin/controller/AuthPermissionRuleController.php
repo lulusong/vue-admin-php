@@ -59,8 +59,8 @@ class AuthPermissionRuleController extends BaseCheckUser
         }
 
         $now_time = time();
-        $status = isset($data['status']) ? $data['status'] : 0;
-        $pid = isset($data['pid']) ? $data['pid'] : 0;
+        $status = !empty($data['status']) ? $data['status'] : 0;
+        $pid = !empty($data['pid']) ? $data['pid'] : 0;
         if ($pid){
             $info = AuthPermissionRule::where('id',$pid)
                 ->field('id')
