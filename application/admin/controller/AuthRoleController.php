@@ -122,13 +122,7 @@ class AuthRoleController extends BaseCheckUser
             throw new JsonException(ErrorCode::NOT_NETWORK);
         }
 
-        $res['id'] = $auth_role->getLastInsID();
-        $res['name'] = $auth_role->name;
-        $res['status'] = $auth_role->status;
-        $res['remark'] = $auth_role->remark;
-        $res['create_time'] = $auth_role->create_time;
-
-        return ResultVo::success($res);
+        return ResultVo::success($auth_role);
     }
 
     /**

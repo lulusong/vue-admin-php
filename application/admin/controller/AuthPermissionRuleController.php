@@ -83,18 +83,7 @@ class AuthPermissionRuleController extends BaseCheckUser
         if (!$result){
             throw new JsonException(ErrorCode::NOT_NETWORK);
         }
-
-        $res['id'] = $auth_permission_rule->getLastInsID();
-        $res['pid'] = $auth_permission_rule->pid;
-        $res['name'] = $auth_permission_rule->name;
-        $res['title'] = $auth_permission_rule->title;
-        $res['status'] = $auth_permission_rule->status;
-        $res['condition'] = $auth_permission_rule->condition;
-        $res['listorder'] = $auth_permission_rule->listorder;
-        $res['create_time'] = $auth_permission_rule->create_time;
-        $res['update_time'] = $auth_permission_rule->update_time;
-
-        return ResultVo::success($res);
+        return ResultVo::success($auth_permission_rule);
     }
 
     /**

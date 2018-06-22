@@ -107,7 +107,7 @@ class AuthAdminController extends BaseCheckUser
         $roles = (isset($data['roles']) && is_array($data['roles'])) ? $data['roles'] : [];
 
         //$adminInfo = $this->adminInfo; // 登录用户信息
-        $admin_id = $auth_admin->getLastInsID();
+        $admin_id = $auth_admin->id;
         if ($roles){
             $temp = [];
             foreach ($roles as $key => $value){
@@ -119,13 +119,10 @@ class AuthAdminController extends BaseCheckUser
             $auth_role_admin->saveAll($temp);
         }
 
-        $res['id'] = $admin_id;
-        $res['username'] = $auth_admin->username;
-        $res['password'] = '';
-        $res['status'] = $auth_admin->status;
-        $res['roles'] = $roles;
+        $auth_admin['password'] = '';
+        $auth_admin['roles'] = $roles;
 
-        return ResultVo::success($res);
+        return ResultVo::success($auth_admin);
     }
 
     /**
