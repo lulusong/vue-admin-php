@@ -74,7 +74,7 @@ CREATE TABLE `auth_permission_rule` (
   `update_time` int(11) DEFAULT '0' COMMENT '更新时间',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8 COMMENT='规则表';
+) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8 COMMENT='规则表';
 
 -- ----------------------------
 -- Records of auth_permission_rule
@@ -94,6 +94,16 @@ INSERT INTO `auth_permission_rule` VALUES ('12', '2', 'admin/auth_permission_rul
 INSERT INTO `auth_permission_rule` VALUES ('13', '12', 'admin/auth_permission_rule/save', '添加权限', '1', '', '999', '1514527182', '1514527182');
 INSERT INTO `auth_permission_rule` VALUES ('14', '12', 'admin/auth_permission_rule/edit', '编辑权限', '1', '', '999', '1514527195', '1514527209');
 INSERT INTO `auth_permission_rule` VALUES ('15', '12', 'admin/auth_permission_rule/delete', '删除权限', '1', '', '999', '1514527223', '1514527223');
+INSERT INTO `auth_permission_rule` VALUES ('16', '0', 'admanage', '广告相关', '1', '', '999', '1530872868', '1530872868');
+INSERT INTO `auth_permission_rule` VALUES ('17', '16', 'admin/ad_site/index', '广告位管理', '1', '', '999', '1530872887', '1530872887');
+INSERT INTO `auth_permission_rule` VALUES ('18', '17', 'admin/ad_site/save', '广告位添加', '1', '', '999', '1530872901', '1530872901');
+INSERT INTO `auth_permission_rule` VALUES ('19', '17', 'admin/ad_site/edit', '广告位编辑', '1', '', '999', '1530872924', '1530872924');
+INSERT INTO `auth_permission_rule` VALUES ('20', '17', 'admin/ad_site/delete', '广告位删除', '1', '', '999', '1530872946', '1530872946');
+INSERT INTO `auth_permission_rule` VALUES ('21', '16', 'admin/ad/index', '广告管理', '1', '', '999', '1530872983', '1530872983');
+INSERT INTO `auth_permission_rule` VALUES ('22', '21', 'admin/ad/save', '广告添加', '1', '', '999', '1530873033', '1530873033');
+INSERT INTO `auth_permission_rule` VALUES ('23', '21', 'admin/ad/edit', '广告编辑', '1', '', '999', '1530873044', '1530873044');
+INSERT INTO `auth_permission_rule` VALUES ('24', '21', 'admin/ad/delete', '广告删除', '1', '', '999', '1530873070', '1530873070');
+INSERT INTO `auth_permission_rule` VALUES ('25', '17', 'admin/ad_site/adlist', '广告位选择时的广告列表', '1', '', '999', '1530873109', '1530873109');
 
 -- ----------------------------
 -- Table structure for auth_role
