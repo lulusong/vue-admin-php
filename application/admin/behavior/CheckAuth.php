@@ -10,8 +10,8 @@ namespace app\admin\behavior;
 
 use app\common\exception\JsonException;
 use app\common\enums\ErrorCode;
-use app\common\model\AuthAdmin;
-use app\common\model\AuthPermissionRule;
+use app\common\model\auth\AuthAdmin;
+use app\common\model\auth\AuthPermissionRule;
 use think\Request;
 
 /**

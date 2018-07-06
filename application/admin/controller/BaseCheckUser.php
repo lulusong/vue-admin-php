@@ -2,7 +2,7 @@
 
 namespace app\admin\controller;
 
-use app\common\model\AuthAdmin;
+use app\common\model\auth\AuthAdmin;
 use think\facade\Hook;
 
 /**

@@ -9,7 +9,7 @@
 // | Author: 黎明晓 <lmxdawn@gmail.com>
 // +----------------------------------------------------------------------
 
-namespace app\common\model;
+namespace app\common\model\auth;
 
 use think\facade\Cache;
 use think\Model;

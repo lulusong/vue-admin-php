@@ -4,9 +4,9 @@ namespace app\admin\controller;
 
 use app\common\exception\JsonException;
 use app\common\enums\ErrorCode;
-use app\common\model\AuthPermission;
-use app\common\model\AuthPermissionRule;
-use \app\common\model\AuthRole;
+use app\common\model\auth\AuthPermission;
+use app\common\model\auth\AuthPermissionRule;
+use \app\common\model\auth\AuthRole;
 use app\common\vo\ResultVo;
 
 /**

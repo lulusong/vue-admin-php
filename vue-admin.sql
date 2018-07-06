@@ -165,3 +165,38 @@ CREATE TABLE `file_resource_tag` (
 -- Records of file_resource_tag
 -- ----------------------------
 INSERT INTO `file_resource_tag` VALUES ('1', '测试', '2018-05-30 20:41:48');
+
+-- ----------------------------
+-- Table structure for ad
+-- ----------------------------
+DROP TABLE IF EXISTS `ad`;
+CREATE TABLE `ad` (
+  `ad_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '广告ID',
+  `title` varchar(255) DEFAULT NULL COMMENT '广告标题',
+  `describe` varchar(255) DEFAULT NULL COMMENT '描述',
+  `jump_type` tinyint(4) DEFAULT '0' COMMENT '跳转方式（1：小程序，2：url链接）',
+  `link_url` varchar(255) DEFAULT NULL COMMENT '跳转类型为 2 时有效',
+  `pic` varchar(255) DEFAULT NULL COMMENT '图片的地址',
+  `wxa_appid` varchar(50) DEFAULT NULL COMMENT '微信小程序的APPID（跳转类型为 1 时有效）',
+  `wxa_path` varchar(255) DEFAULT NULL COMMENT '跳转小程序的路径（跳转类型为 1 时有效）',
+  `extra_data` varchar(255) DEFAULT NULL COMMENT '跳转到小程序时的参数（跳转类型为 1 时有效）',
+  `env_version` varchar(10) DEFAULT NULL COMMENT '跳转的小程序版本（跳转类型为 1 时有效）',
+  `status` tinyint(4) DEFAULT '0' COMMENT '广告状态（0：禁用，1：正常）',
+  `create_time` timestamp NULL DEFAULT NULL COMMENT '创建时间',
+  `update_time` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`ad_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='广告表';
+
+-- ----------------------------
+-- Table structure for ad_site
+-- ----------------------------
+DROP TABLE IF EXISTS `ad_site`;
+CREATE TABLE `ad_site` (
+  `site_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '广告位id',
+  `site_name` varchar(255) DEFAULT NULL COMMENT '广告位名称',
+  `describe` varchar(255) DEFAULT NULL COMMENT '广告位描述',
+  `ad_ids` varchar(255) DEFAULT NULL COMMENT '广告位的广告id（多个用 , 号隔开）',
+  `create_time` timestamp NULL DEFAULT NULL COMMENT '创建时间',
+  `update_time` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`site_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='广告位';

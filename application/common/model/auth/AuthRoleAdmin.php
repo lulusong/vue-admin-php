@@ -9,14 +9,14 @@
 // | Author: 黎明晓 <lmxdawn@gmail.com>
 // +----------------------------------------------------------------------
 
-namespace app\common\model;
+namespace app\common\model\auth;
 
 use think\Model;
 
 /**
- * 角色表
+ * 用户角色对应表
  */
-class AuthRole extends Model
+class AuthRoleAdmin extends Model
 {
 
 //    protected $pk = 'id';
