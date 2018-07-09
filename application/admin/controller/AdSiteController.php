@@ -32,7 +32,7 @@ class AdSiteController extends BaseCheckUser
             'list_rows' => ($limit <= 0 || $limit > 20) ? 20 : $limit,
         ];
         $lists = AdSiteModel::where($where)
-            ->field('site_id,site_name,describe,ad_ids')
+            ->field('site_id,site_name,describe,ad_ids,update_time')
             ->paginate($paginate);
         foreach ($lists as $v) {
             $ad_ids = !empty($v['ad_ids']) ? explode(",", $v['ad_ids']) : [];
