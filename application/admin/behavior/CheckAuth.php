@@ -26,7 +26,13 @@ class CheckAuth
     {
         // 行为逻辑
         $id = request()->header('X-Adminid');
+        if (!$id) {
+            $id = request()->cookie('ADMIN-ID');
+        }
         $token = request()->header('X-Token');
+        if (!$token) {
+            $token = request()->cookie('ADMIN-TOKEN');
+        }
         if (!$id || !$token) {
             throw new JsonException(ErrorCode::LOGIN_FAILED);
         }
