@@ -65,13 +65,13 @@ class LoginController extends Base
             }
         }
         $info['authRules'] = $authRules;
-        //        $info['authRules'] = [
-        //            'user_manage',
-        //            'user_manage/admin',
-        //            'admin/admin/index',
-        //            'admin/role/index',
-        //            'admin/authRule/index',
-        //        ];
+       // $info['authRules'] = [
+       //     'user_manage',
+       //     'user_manage/admin_manage',
+       //     'admin/admin/index',
+       //     'admin/role/index',
+       //     'admin/auth_admin/index',
+       // ];
         // 保存用户信息
         $loginInfo = AuthAdmin::loginInfo($info['id'],$info);
         $admin->last_login_ip = request()->ip();
