@@ -44,6 +44,7 @@ class LoginController extends Base
         }
 
         $info = $admin->toArray();
+
         unset($info['password']);
 
         // 权限信息
