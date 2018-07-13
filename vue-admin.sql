@@ -94,7 +94,7 @@ INSERT INTO `auth_permission_rule` VALUES ('12', '2', 'admin/auth_permission_rul
 INSERT INTO `auth_permission_rule` VALUES ('13', '12', 'admin/auth_permission_rule/save', '添加权限', '1', '', '999', '1514527182', '1514527182');
 INSERT INTO `auth_permission_rule` VALUES ('14', '12', 'admin/auth_permission_rule/edit', '编辑权限', '1', '', '999', '1514527195', '1514527209');
 INSERT INTO `auth_permission_rule` VALUES ('15', '12', 'admin/auth_permission_rule/delete', '删除权限', '1', '', '999', '1514527223', '1514527223');
-INSERT INTO `auth_permission_rule` VALUES ('16', '0', 'admanage', '广告相关', '1', '', '999', '1530872868', '1530872868');
+INSERT INTO `auth_permission_rule` VALUES ('16', '0', 'ad_manage', '广告相关', '1', '', '999', '1530872868', '1530872868');
 INSERT INTO `auth_permission_rule` VALUES ('17', '16', 'admin/ad_site/index', '广告位管理', '1', '', '999', '1530872887', '1530872887');
 INSERT INTO `auth_permission_rule` VALUES ('18', '17', 'admin/ad_site/save', '广告位添加', '1', '', '999', '1530872901', '1530872901');
 INSERT INTO `auth_permission_rule` VALUES ('19', '17', 'admin/ad_site/edit', '广告位编辑', '1', '', '999', '1530872924', '1530872924');
