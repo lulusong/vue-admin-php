@@ -19,7 +19,7 @@ if (!function_exists('get_asset_static_path')) {
     function get_asset_static_path($asset_url = ''){
         if (empty($asset_url))
             return $asset_url;
-        $filepath = config('static_url') . '/static/' . $asset_url;
+        $filepath = config('public_file.static_url') . '/static/' . $asset_url;
         return $filepath;
     }
 }
@@ -51,7 +51,7 @@ if (!function_exists('get_asset_upload_path')) {
             return $file;
         }
 
-        $filepath = config('custom.upload_domain') . '/uploads/' . $file;
+        $filepath = config('public_file.upload_domain') . '/uploads/' . $file;
 
         return $filepath;
 
