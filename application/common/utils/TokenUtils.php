@@ -24,7 +24,7 @@ class TokenUtils
     public static function create($v)
     {
         $key = mt_rand();
-        $hash = hash_hmac("SHA256", $v . mt_rand() . time(), $key, true);
+        $hash = hash_hmac("sha1", $v . mt_rand() . time(), $key, true);
         $token = str_replace('=', '', strtr(base64_encode($hash), '+/', '-_'));
         return $token;
     }
