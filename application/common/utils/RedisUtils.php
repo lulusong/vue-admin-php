@@ -18,9 +18,11 @@ use think\facade\Cache;
 class RedisUtils
 {
 
-    /*
+    /**
      * 获取 redis 实例
+     * @return bool|\Redis
      */
+
     public static function init()
     {
         $redis = Cache::init()->handler();
