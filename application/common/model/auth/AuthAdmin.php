@@ -11,6 +11,7 @@
 
 namespace app\common\model\auth;
 
+use app\common\utils\TokenUtils;
 use think\facade\Cache;
 use think\Model;
 
@@ -33,19 +34,6 @@ class AuthAdmin extends Model
     }
 
     /**
-     * 生成 token
-     * @param int $uid 用户的 UID
-     * @return string
-     */
-    public static function createToken($uid){
-        // TODO 这里的key需要换成自己的 目前用的是 随机的，这样不能反编译
-        $key = mt_rand();
-        $hash = hash_hmac("SHA256", $uid . mt_rand() . time(), $key, true);
-        $token = str_replace('=', '', strtr(base64_encode($hash), '+/', '-_'));
-        return $token;
-    }
-
-    /**
      * 获取登录信息
      * @param int $id 用户ID
      * @param array|string $values 如果这个值为数组则为设置用户信息，否则为 token
@@ -59,7 +47,7 @@ class AuthAdmin extends Model
         if ($redis instanceof \Redis){
             if ($values && is_array($values)){
                 $values['id'] = $id;
-                $values['token'] = self::createToken($id);
+                $values['token'] = TokenUtils::create("admin" . $id);
                 $values['authRules'] = isset($values['authRules']) ? json_encode($values['authRules']) : '';
                 $res = $redis->hMset($key, $values);
                 $values = $values['token'];
@@ -76,7 +64,7 @@ class AuthAdmin extends Model
         }else{
             if ($values && is_array($values)){
                 $values['id'] = $id;
-                $values['token'] = self::createToken($id);
+                $values['token'] = TokenUtils::create("admin" . $id);
                 $res = Cache::set($key, $values);
                 $values = $values['token'];
             }
