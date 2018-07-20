@@ -11,6 +11,8 @@
 
 namespace app\common\model\auth;
 
+use app\common\constant\CacheKeyConstant;
+use app\common\utils\RedisUtils;
 use app\common\utils\TokenUtils;
 use think\facade\Cache;
 use think\Model;
@@ -21,18 +23,6 @@ use think\Model;
 class AuthAdmin extends Model
 {
 
-    // 缓存的 key
-    public static $cache_info = 'admin:id:';
-
-    /**
-     * 返回加密后的密码
-     * @param $pwd
-     * @return string
-     */
-    public static function getPass($pwd){
-        return md5(md5($pwd));
-    }
-
     /**
      * 获取登录信息
      * @param int $id 用户ID
@@ -41,10 +31,10 @@ class AuthAdmin extends Model
      * @return array|bool 成功返回用户信息，否则返回 false
      */
     public static function loginInfo($id, $values,$is_login = true){
-        $redis = Cache::init()->handler();
-        $key = self::$cache_info . $id;
+        $redis = RedisUtils::init();
+        $key = CacheKeyConstant::ADMIN_LOGIN_KEY . $id;
         // 判断缓存类是否为 redis
-        if ($redis instanceof \Redis){
+        if ($redis){
             if ($values && is_array($values)){
                 $values['id'] = $id;
                 $values['token'] = TokenUtils::create("admin" . $id);
@@ -87,29 +77,14 @@ class AuthAdmin extends Model
      * @return array|mixed
      */
     public static function loginOut($id){
-        $redis = Cache::init()->handler();
-        $key = self::$cache_info . $id;
+        $redis = RedisUtils::init();
+        $key = CacheKeyConstant::ADMIN_LOGIN_KEY . $id;
         // 判断缓存类是否为 redis
-        if ($redis instanceof \Redis){
+        if ($redis){
             $redis->del($key);
         }else{
             Cache::rm($key);
         }
-    }
-
-    /**
-     * 获取头像的 URL
-     * @param string $avatar 头像路径
-     * @param int $size 获取的尺寸
-     * @return string URL
-     */
-    public static function getAvatarUrl($avatar, $size = 0){
-        if ($size && ($size == 50 || $size == 100)){
-            $size_str = "_{$size}_{$size}";
-            $ripos = strripos($avatar,'.'); // 最后一个点出现的位置
-            $avatar = substr_replace($avatar, $size_str, $ripos, 0);
-        }
-        return get_asset_image_url($avatar);
     }
 
 }

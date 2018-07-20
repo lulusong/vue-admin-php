@@ -30,15 +30,6 @@ class FileResource extends Model
         return Env::get('root_path') . 'public' . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR;
     }
 
-    /**
-     * 获取url
-     * @param $path
-     * @return string
-     */
-    public static function getUrl($path){
-        return get_asset_upload_path($path);
-    }
-
     /*
      * 获取类型的path
      */

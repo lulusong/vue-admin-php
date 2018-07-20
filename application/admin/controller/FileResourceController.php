@@ -5,6 +5,7 @@ namespace app\admin\controller;
 use app\admin\model\FileResource;
 use app\common\exception\JsonException;
 use app\common\enums\ErrorCode;
+use app\common\utils\PublicFileUtils;
 use app\common\vo\ResultVo;
 use think\File;
 
@@ -39,7 +40,7 @@ class FileResourceController extends Base
             ->paginate($paginate);
 
         foreach ($lists as $k => $v) {
-            $v['url'] = $file_resource::getUrl($v['path']);
+            $v['url'] = PublicFileUtils::createUploadUrl($v['path']);
             $v['create_time'] = strtotime($v['create_time']);
             $lists[$k] = $v;
         }
@@ -96,7 +97,7 @@ class FileResourceController extends Base
         $file_resource->create_time = date("Y-m-d H:i:s");
         $file_resource->save();
         $file_resource->create_time = time();
-        $file_resource->url = FileResource::getUrl($path);
+        $file_resource->url = PublicFileUtils::createUploadUrl($path);
         $file_resource->id = intval($file_resource->id);
         return ResultVo::success($file_resource);
     }

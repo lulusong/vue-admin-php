@@ -4,6 +4,7 @@ namespace app\admin\controller;
 
 use app\common\exception\JsonException;
 use app\common\enums\ErrorCode;
+use app\common\utils\PublicFileUtils;
 use app\common\vo\ResultVo;
 use think\facade\Env;
 use think\File;
@@ -81,7 +82,7 @@ class UploadFileController extends Base
             "path" => $path,
             "filename" => $filename,
             "className" => '',
-            'url' => get_asset_upload_path($path),
+            'url' => PublicFileUtils::createUploadUrl($path),
             'mtime' => time(),
             "is_dir" => 1,
             "fileExt" => '',
@@ -151,7 +152,7 @@ class UploadFileController extends Base
             "path" => $path,
             "filename" => $info->getFilename(),
             "className" => $className,
-            'url' => get_asset_upload_path($path),
+            'url' => PublicFileUtils::createUploadUrl($path),
             'mtime' => time(),
             "is_dir" => 0,
             "fileExt" => $fileExt,
@@ -172,7 +173,7 @@ class UploadFileController extends Base
         $pathName = self::$RESOURCES_PATH . $pathName;
         $pathName = trim($pathName, '/'); // 去掉最前或者最后的 /
         $pathName = trim($pathName, '\\'); // 去掉最前或者最后的 \
-        $baseUrl = get_asset_upload_path();
+        $baseUrl = PublicFileUtils::createUploadUrl();
         /* 获取参数 */
         $size = request()->get('size/d', 20);
         $page = request()->get('page/d', 1);

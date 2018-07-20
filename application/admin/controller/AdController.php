@@ -4,6 +4,7 @@ namespace app\admin\controller;
 
 use app\common\enums\ErrorCode;
 use \app\common\model\ad\Ad as AdModel;
+use app\common\utils\PublicFileUtils;
 use app\common\vo\ResultVo;
 
 /**
@@ -36,7 +37,7 @@ class AdController extends BaseCheckUser
 
         foreach ($lists as $k => $v) {
             $temp = $v;
-            $temp['pic_url'] = get_asset_upload_path($v['pic']);
+            $temp['pic_url'] = PublicFileUtils::createUploadUrl($v['pic']);
             $temp['jump_type'] = !empty($v['jump_type']) ? $v['jump_type'] : '';
             $temp['link_url'] = !empty($v['link_url']) ? $v['link_url'] : '';
             $temp['wxa_appid'] = !empty($v['wxa_appid']) ? $v['wxa_appid'] : '';

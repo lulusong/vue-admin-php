@@ -7,6 +7,8 @@ use app\common\enums\ErrorCode;
 use app\common\model\auth\AuthAdmin;
 use app\common\model\auth\AuthRole;
 use app\common\model\auth\AuthRoleAdmin;
+use app\common\utils\PassWordUtils;
+use app\common\utils\PublicFileUtils;
 use app\common\vo\ResultVo;
 
 /**
@@ -52,7 +54,7 @@ class AuthAdminController extends BaseCheckUser
             ->paginate($paginate);
 
         foreach ($lists as $k => $v) {
-            $v['avatar'] = AuthAdmin::getAvatarUrl($v['avatar']);
+            $v['avatar'] = PublicFileUtils::createUploadUrl($v['avatar']);
             $roles = AuthRoleAdmin::where('admin_id',$v['id'])->field('role_id')->select();
             $temp_roles = [];
             if ($roles){
@@ -95,7 +97,7 @@ class AuthAdminController extends BaseCheckUser
         $status = isset($data['status']) ? $data['status'] : 0;
         $auth_admin = new AuthAdmin();
         $auth_admin->username = $username;
-        $auth_admin->password = AuthAdmin::getPass($data['password']);
+        $auth_admin->password = PassWordUtils::create($data['password']);
         $auth_admin->status = $status;
         $auth_admin->create_time = time();
         $result = $auth_admin->save();

@@ -8,6 +8,8 @@ use app\common\model\auth\AuthAdmin;
 use app\common\model\auth\AuthPermission;
 use app\common\model\auth\AuthPermissionRule;
 use app\common\model\auth\AuthRoleAdmin;
+use app\common\utils\PassWordUtils;
+use app\common\utils\PublicFileUtils;
 use app\common\vo\ResultVo;
 
 /**
@@ -36,7 +38,7 @@ class LoginController extends Base
             ->field('id,username,avatar,password,status')
             ->find();
 
-        if (empty($admin) || AuthAdmin::getPass($pwd) != $admin->password){
+        if (empty($admin) ||  PassWordUtils::create($pwd) != $admin->password){
             throw new JsonException(ErrorCode::USER_AUTH_FAIL);
         }
         if ($admin->status != 1){
@@ -96,7 +98,7 @@ class LoginController extends Base
         }
         $res = AuthAdmin::loginInfo($id, (string)$token);
         $res['id'] = !empty($res['id']) ? intval($res['id']) : 0;
-        $res['avatar'] = !empty($res['avatar']) ? AuthAdmin::getAvatarUrl($res['avatar']) : '';
+        $res['avatar'] = !empty($res['avatar']) ? PublicFileUtils::createUploadUrl($res['avatar']) : '';
         // $res['roles'] = ['admin'];
         return ResultVo::success($res);
     }
@@ -147,15 +149,15 @@ class LoginController extends Base
         $new_password = request()->post('new_password');
 
         $admin_info = AuthAdmin::where('id',$id)->field('username,password')->find();
-        if ($admin_info['password'] != AuthAdmin::getPass($old_password)){
+        if ($admin_info['password'] != PassWordUtils::create($old_password)){
             throw new JsonException(ErrorCode::USER_AUTH_FAIL, "原始密码错误");
         }
 
-        if ($admin_info['password'] == AuthAdmin::getPass($new_password)){
+        if ($admin_info['password'] == PassWordUtils::create($new_password)){
             throw new JsonException(ErrorCode::USER_AUTH_FAIL, "密码未做修改");
         }
 
-        $admin_info->password = AuthAdmin::getPass($new_password);
+        $admin_info->password = PassWordUtils::create($new_password);
         if (!$admin_info->save()){
             throw new JsonException(ErrorCode::NOT_NETWORK);
         }
