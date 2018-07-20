@@ -38,7 +38,11 @@ class AuthAdmin extends Model
      * @return string
      */
     public static function createToken($uid){
-        return (base64_encode($uid . time()));
+        // TODO 这里的key需要换成自己的 目前用的是 随机的，这样不能反编译
+        $key = mt_rand();
+        $hash = hash_hmac("SHA256", $uid . mt_rand() . time(), $key, true);
+        $token = str_replace('=', '', strtr(base64_encode($hash), '+/', '-_'));
+        return $token;
     }
 
     /**
