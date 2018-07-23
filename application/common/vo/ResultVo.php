@@ -17,12 +17,6 @@ class ResultVo
      */
     public $message;
 
-    /**
-     * 返回的data
-     * @var
-     */
-    public $data;
-
     private function __construct($code, $message)
     {
         $this->code = $code;
