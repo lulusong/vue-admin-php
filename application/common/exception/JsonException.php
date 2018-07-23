@@ -4,22 +4,20 @@ namespace app\common\exception;
 
 use think\Exception;
 
+
 /**
- * admin 模块需要返回 Json 格式的错误异常
- * Class AdminException
+ * 返回 Json 格式的错误异常
  */
 class JsonException extends Exception
 {
 
-    public function __construct($errcode, $errmsg = null)
+    public function __construct($code, $message = "")
     {
-        if (is_array($errcode)) {
-            $errmsg = isset($errcode['message']) && $errmsg == null ? $errcode['message'] : $errmsg;
-            $errcode = isset($errcode['code']) ? $errcode['code'] : null;
+        if (is_array($code)) {
+            $message = isset($code['message']) && empty($message) ? $code['message'] : $message;
+            $code = isset($code['code']) ? $code['code'] : 0;
         }
-        \Exception::__construct($errmsg, $errcode);
+        \Exception::__construct($message, $code);
     }
-
-
 
 }

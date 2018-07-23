@@ -23,11 +23,10 @@ class ResultVo
      */
     public $data;
 
-    private function __construct($code, $message, $data)
+    private function __construct($code, $message)
     {
         $this->code = $code;
         $this->message = $message;
-        $this->data = $data;
     }
 
     /**
@@ -44,16 +43,15 @@ class ResultVo
      * 请求错误
      * @param $code
      * @param null $message
-     * @param string $data
      * @return \think\response\Json
      */
-    public static function error($code, $message = null, $data = '')
+    public static function error($code, $message = null)
     {
         if (is_array($code)) {
             $message = isset($code['message']) && $message == null ? $code['message'] : $message;
             $code = isset($code['code']) ? $code['code'] : null;
         }
-        $instance = new self($code, $message, $data);
+        $instance = new self($code, $message);
         return json($instance);
     }
 
