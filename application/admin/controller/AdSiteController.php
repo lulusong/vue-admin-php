@@ -67,7 +67,7 @@ class AdSiteController extends BaseCheckUser
         foreach ($lists as $k => $v) {
             $temp = [];
             $temp['key'] = $v['ad_id'];
-            $temp['label'] = $v['title'] . '-' . $v['describe'];
+            $temp['label'] = $v['ad_id'] . '-' . $v['title'] . '-' . $v['describe'];
             $temp['disabled'] = $v['status'] !== 1;
             $temp['describe'] = $v['describe'];
             $data[] = $temp;
@@ -84,7 +84,7 @@ class AdSiteController extends BaseCheckUser
             foreach ($temp_data as $k => $v) {
                 $temp = [];
                 $temp['key'] = $v['ad_id'];
-                $temp['label'] = $v['title'] . '-' . $v['describe'];
+                $temp['label'] = $v['ad_id'] . '-' . $v['title'] . '-' . $v['describe'];
                 $temp['disabled'] = $v['status'] !== 1;
                 $temp['describe'] = $v['describe'];
                 $data[] = $temp;
