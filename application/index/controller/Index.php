@@ -3,7 +3,6 @@ namespace app\index\controller;
 
 use app\common\exception\JsonException;
 use app\common\enums\ErrorCode;
-use app\common\model\Admin;
 use app\common\vo\ResultVo;
 
 class Index
