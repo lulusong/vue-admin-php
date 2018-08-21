@@ -5,8 +5,22 @@
 // +----------------------------------------------------------------------
 
 return [
-    // 上传文件的基础地址
-    'upload_base_url'   => 'http://localhost/vue-admin-php/public/uploads/',
-    // 静态文件的基础地址
-    'static_base_url'   => 'http://localhost/vue-admin-php/public/static/',
+    // 七牛云的配置
+    "qiniu" => [
+        "accessKey" => "GRUuplbSg1DrFbLlx2__UPc0Qe0oIcIdqVRPgQ6i",
+        "secretKey" => "UwiQppAPUFwITkxvVOqLTaM-WXLVvP-XqDbjqaXK",
+    ],
+    // 一些空间的配置
+    "default" => [
+        'upload_url'   => 'https://upload.qiniup.com',
+        'domain'   => 'http://pdst9ljao.bkt.clouddn.com',
+    ],
+    "day-file" => [
+        'upload_url'   => 'https://upload.qiniup.com',
+        'domain'   => 'http://pdst9ljao.bkt.clouddn.com',
+    ],
+    "tongnian-img" => [
+        'upload_url'   => 'https://upload.qiniup.com',
+        'domain'   => 'http://pdst9ljao.bkt.clouddn.com',
+    ],
 ];

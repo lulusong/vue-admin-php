@@ -17,32 +17,20 @@ class PublicFileUtils
 
     /**
      * 生成上传文件的url
-     * @param $file_path
+     * @param string $file_path 文件path
+     * @param string $bucket 空间名称
      * @return string
      */
-    public static function createUploadUrl($file_path = '')
+    public static function createUploadUrl($file_path = '', $bucket = '')
     {
         if(strpos($file_path,"http") === 0){
             return $file_path;
         }else if(strpos($file_path,"/") === 0){
             return $file_path;
         }
+        $bucket = $bucket ? $bucket : "default";
+        $url = config('public_file.' . $bucket . '.upload_url') . '/' . $file_path;
 
-        $url = config('public_file.upload_base_url') . $file_path;
-
-        return $url;
-    }
-
-    /**
-     * 生成静态资源的url
-     * @param $asset_path
-     * @return string
-     */
-    public static function createStaticUrl($asset_path = '')
-    {
-        if (empty($asset_path))
-            return $asset_path;
-        $url = config('public_file.static_base_url') . $asset_path;
         return $url;
     }
 
