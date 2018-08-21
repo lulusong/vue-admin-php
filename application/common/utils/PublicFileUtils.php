@@ -21,16 +21,16 @@ class PublicFileUtils
      * @param string $bucket 空间名称
      * @return string
      */
-    public static function createUploadUrl($file_path = '', $bucket = '')
+    public static function createUploadUrl($file_path = '', $bucket = 'default')
     {
         if(strpos($file_path,"http") === 0){
             return $file_path;
         }else if(strpos($file_path,"/") === 0){
             return $file_path;
         }
-        $bucket = $bucket ? $bucket : "default";
-        $url = config('public_file.' . $bucket . '.domain') . '/' . $file_path;
-
+        $domain = config('public_file.' . $bucket . '.domain');
+        $domain = $domain || $bucket == 'default' ? $domain : config('public_file.default.domain');
+        $url = $domain . '/' . $file_path;
         return $url;
     }
 
