@@ -29,7 +29,7 @@ class PublicFileUtils
             return $file_path;
         }
         $bucket = $bucket ? $bucket : "default";
-        $url = config('public_file.' . $bucket . '.upload_url') . '/' . $file_path;
+        $url = config('public_file.' . $bucket . '.domain') . '/' . $file_path;
 
         return $url;
     }
