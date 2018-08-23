@@ -113,6 +113,7 @@ class AdSiteController extends BaseCheckUser
         if (!$result){
             return ResultVo::error(ErrorCode::NOT_NETWORK);
         }
+        $ad_site->ad_ids = !empty($data['ad_ids']) ? $data['ad_ids'] : [];
         return json($ad_site);
     }
 
