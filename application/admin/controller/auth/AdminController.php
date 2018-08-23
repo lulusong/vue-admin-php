@@ -1,8 +1,8 @@
 <?php
 
-namespace app\admin\controller;
+namespace app\admin\controller\auth;
 
-use app\common\exception\JsonException;
+use app\admin\controller\BaseCheckUser;
 use app\common\enums\ErrorCode;
 use app\common\model\auth\AuthAdmin;
 use app\common\model\auth\AuthRole;
@@ -14,7 +14,7 @@ use app\common\vo\ResultVo;
 /**
  * 管理员相关
  */
-class AuthAdminController extends BaseCheckUser
+class AdminController extends BaseCheckUser
 {
 
     /**
@@ -83,7 +83,7 @@ class AuthAdminController extends BaseCheckUser
     public function save(){
         $data = request()->post();
         if (empty($data['username']) || empty($data['password'])){
-            throw new JsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
+            ResultVo::error(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
         $username = $data['username'];
         // 模型
@@ -91,7 +91,7 @@ class AuthAdminController extends BaseCheckUser
             ->field('username')
             ->find();
         if ($info){
-            throw new JsonException(ErrorCode::DATA_REPEAT);
+            ResultVo::error(ErrorCode::DATA_REPEAT);
         }
 
         $status = isset($data['status']) ? $data['status'] : 0;
@@ -103,7 +103,7 @@ class AuthAdminController extends BaseCheckUser
         $result = $auth_admin->save();
 
         if (!$result){
-            throw new JsonException(ErrorCode::NOT_NETWORK);
+            ResultVo::error(ErrorCode::NOT_NETWORK);
         }
 
         $roles = (isset($data['roles']) && is_array($data['roles'])) ? $data['roles'] : [];
@@ -133,7 +133,7 @@ class AuthAdminController extends BaseCheckUser
     public function edit(){
         $data = request()->post();
         if (empty($data['id']) || empty($data['username'])){
-            throw new JsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
+            ResultVo::error(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
         $id = $data['id'];
         $username = strip_tags($data['username']);
@@ -142,13 +142,13 @@ class AuthAdminController extends BaseCheckUser
             ->field('id,username')
             ->find();
         if (!$auth_admin){
-            throw new JsonException(ErrorCode::DATA_NOT, "管理员不存在");
+            ResultVo::error(ErrorCode::DATA_NOT, "管理员不存在");
         }
         $login_info = $this->adminInfo;
         $login_user_name = isset($login_info['username']) ? $login_info['username'] : '';
         // 如果是超级管理员，判断当前登录用户是否匹配
         if ($auth_admin->username == 'admin' && $login_user_name != $auth_admin->username){
-            throw new JsonException(ErrorCode::DATA_NOT, "最高权限用户，无权修改");
+            ResultVo::error(ErrorCode::DATA_NOT, "最高权限用户，无权修改");
         }
 
         $info = AuthAdmin::where('username',$username)
@@ -156,11 +156,11 @@ class AuthAdminController extends BaseCheckUser
             ->find();
         // 判断username 是否重名，剔除自己
         if (!empty($info['id']) && $info['id'] != $id){
-            throw new JsonException(ErrorCode::DATA_REPEAT, "管理员已存在");
+            ResultVo::error(ErrorCode::DATA_REPEAT, "管理员已存在");
         }
 
         $status = isset($data['status']) ? $data['status'] : 0;
-        $password = isset($data['password']) ? AdminModel::getPass($data['password']) : '';
+        $password = isset($data['password']) ? PassWordUtils::create($data['password']) : '';
         $auth_admin->username = $username;
         if ($password){
             $auth_admin->password = $password;
@@ -178,7 +178,7 @@ class AuthAdminController extends BaseCheckUser
             }
             // 没有差值，权限也没做更改
             if ($roles == $temp_roles){
-                throw new JsonException(ErrorCode::DATA_CHANGE);
+                ResultVo::error(ErrorCode::DATA_CHANGE);
             }
         }
 
@@ -205,11 +205,11 @@ class AuthAdminController extends BaseCheckUser
     public function delete(){
         $id = request()->post('id/d');
         if (empty($id)){
-            throw new JsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
+            ResultVo::error(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
         $auth_admin = AuthAdmin::where('id',$id)->field('username')->find();
         if (!$auth_admin || $auth_admin['username'] == 'admin' || !$auth_admin->delete()){
-            throw new JsonException(ErrorCode::NOT_NETWORK);
+            ResultVo::error(ErrorCode::NOT_NETWORK);
         }
         // 删除权限
         AuthRoleAdmin::where('admin_id',$id)->delete();

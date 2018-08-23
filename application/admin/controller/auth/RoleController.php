@@ -1,8 +1,8 @@
 <?php
 
-namespace app\admin\controller;
+namespace app\admin\controller\auth;
 
-use app\common\exception\JsonException;
+use app\admin\controller\BaseCheckUser;
 use app\common\enums\ErrorCode;
 use app\common\model\auth\AuthPermission;
 use app\common\model\auth\AuthPermissionRule;
@@ -12,7 +12,7 @@ use app\common\vo\ResultVo;
 /**
  * 角色相关
  */
-class AuthRoleController extends BaseCheckUser
+class RoleController extends BaseCheckUser
 {
 
     /**
@@ -70,7 +70,7 @@ class AuthRoleController extends BaseCheckUser
         $data = request()->post();
         $role_id = isset($data['role_id']) ? $data['role_id'] : '';
         if (!$role_id){
-            throw new JsonException(ErrorCode::NOT_NETWORK);
+            ResultVo::error(ErrorCode::NOT_NETWORK);
         }
         $auth_rules = isset($data['auth_rules']) ? $data['auth_rules'] : [];
         $rule_access = [];
@@ -84,7 +84,7 @@ class AuthRoleController extends BaseCheckUser
         $auth_permission = new AuthPermission();
         $auth_permission->where(['role_id' => $role_id])->delete();
         if (!$rule_access || !$auth_permission->saveAll($rule_access)){
-            throw new JsonException(ErrorCode::NOT_NETWORK);
+            ResultVo::error(ErrorCode::NOT_NETWORK);
         }
 
         return ResultVo::success("SUCCESS");
@@ -97,7 +97,7 @@ class AuthRoleController extends BaseCheckUser
     public function save(){
         $data = request()->post();
         if (empty($data['name']) || empty($data['status'])){
-            throw new JsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
+            ResultVo::error(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
         $name = $data['name'];
         // 菜单模型
@@ -105,7 +105,7 @@ class AuthRoleController extends BaseCheckUser
             ->field('name')
             ->find();
         if ($info){
-            throw new JsonException(ErrorCode::DATA_REPEAT);
+            ResultVo::error(ErrorCode::DATA_REPEAT);
         }
 
         $now_time = time();
@@ -119,7 +119,7 @@ class AuthRoleController extends BaseCheckUser
         $result = $auth_role->save();
 
         if (!$result){
-            throw new JsonException(ErrorCode::NOT_NETWORK);
+            ResultVo::error(ErrorCode::NOT_NETWORK);
         }
 
         return ResultVo::success($auth_role);
@@ -131,7 +131,7 @@ class AuthRoleController extends BaseCheckUser
     public function edit(){
         $data = request()->post();
         if (empty($data['id']) || empty($data['name'])){
-            throw new JsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
+            ResultVo::error(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
         $id = $data['id'];
         $name = strip_tags($data['name']);
@@ -140,7 +140,7 @@ class AuthRoleController extends BaseCheckUser
             ->field('id')
             ->find();
         if (!$auth_role){
-            throw new JsonException(ErrorCode::DATA_NOT, "角色不存在");
+            ResultVo::error(ErrorCode::DATA_NOT, "角色不存在");
         }
 
         $info = AuthRole::where('name',$name)
@@ -148,7 +148,7 @@ class AuthRoleController extends BaseCheckUser
             ->find();
         // 判断角色名称 是否重名，剔除自己
         if (!empty($info['id']) && $info['id'] != $id){
-            throw new JsonException(ErrorCode::DATA_REPEAT);
+            ResultVo::error(ErrorCode::DATA_REPEAT);
         }
 
         $status = isset($data['status']) ? $data['status'] : 0;
@@ -160,7 +160,7 @@ class AuthRoleController extends BaseCheckUser
         $result = $auth_role->save();
 
         if (!$result){
-            throw new JsonException(ErrorCode::DATA_CHANGE);
+            ResultVo::error(ErrorCode::DATA_CHANGE);
         }
 
 
@@ -174,10 +174,10 @@ class AuthRoleController extends BaseCheckUser
     public function delete(){
         $id = request()->post('id/d');
         if (empty($id)){
-            throw new JsonException(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
+            ResultVo::error(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
         if (!AuthRole::where('id',$id)->delete()){
-            throw new JsonException(ErrorCode::NOT_NETWORK);
+            ResultVo::error(ErrorCode::NOT_NETWORK);
         }
 
         return ResultVo::success("SUCCESS");
