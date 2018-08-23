@@ -83,7 +83,7 @@ class AdminController extends BaseCheckUser
     public function save(){
         $data = request()->post();
         if (empty($data['username']) || empty($data['password'])){
-            ResultVo::error(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
+            return ResultVo::error(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
         $username = $data['username'];
         // 模型
@@ -91,7 +91,7 @@ class AdminController extends BaseCheckUser
             ->field('username')
             ->find();
         if ($info){
-            ResultVo::error(ErrorCode::DATA_REPEAT);
+            return ResultVo::error(ErrorCode::DATA_REPEAT);
         }
 
         $status = isset($data['status']) ? $data['status'] : 0;
@@ -103,7 +103,7 @@ class AdminController extends BaseCheckUser
         $result = $auth_admin->save();
 
         if (!$result){
-            ResultVo::error(ErrorCode::NOT_NETWORK);
+            return ResultVo::error(ErrorCode::NOT_NETWORK);
         }
 
         $roles = (isset($data['roles']) && is_array($data['roles'])) ? $data['roles'] : [];
@@ -133,7 +133,7 @@ class AdminController extends BaseCheckUser
     public function edit(){
         $data = request()->post();
         if (empty($data['id']) || empty($data['username'])){
-            ResultVo::error(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
+            return ResultVo::error(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
         $id = $data['id'];
         $username = strip_tags($data['username']);
@@ -142,13 +142,13 @@ class AdminController extends BaseCheckUser
             ->field('id,username')
             ->find();
         if (!$auth_admin){
-            ResultVo::error(ErrorCode::DATA_NOT, "管理员不存在");
+            return ResultVo::error(ErrorCode::DATA_NOT, "管理员不存在");
         }
         $login_info = $this->adminInfo;
         $login_user_name = isset($login_info['username']) ? $login_info['username'] : '';
         // 如果是超级管理员，判断当前登录用户是否匹配
         if ($auth_admin->username == 'admin' && $login_user_name != $auth_admin->username){
-            ResultVo::error(ErrorCode::DATA_NOT, "最高权限用户，无权修改");
+            return ResultVo::error(ErrorCode::DATA_NOT, "最高权限用户，无权修改");
         }
 
         $info = AuthAdmin::where('username',$username)
@@ -156,7 +156,7 @@ class AdminController extends BaseCheckUser
             ->find();
         // 判断username 是否重名，剔除自己
         if (!empty($info['id']) && $info['id'] != $id){
-            ResultVo::error(ErrorCode::DATA_REPEAT, "管理员已存在");
+            return ResultVo::error(ErrorCode::DATA_REPEAT, "管理员已存在");
         }
 
         $status = isset($data['status']) ? $data['status'] : 0;
@@ -178,7 +178,7 @@ class AdminController extends BaseCheckUser
             }
             // 没有差值，权限也没做更改
             if ($roles == $temp_roles){
-                ResultVo::error(ErrorCode::DATA_CHANGE);
+                return ResultVo::error(ErrorCode::DATA_CHANGE);
             }
         }
 
@@ -205,11 +205,11 @@ class AdminController extends BaseCheckUser
     public function delete(){
         $id = request()->post('id/d');
         if (empty($id)){
-            ResultVo::error(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
+            return ResultVo::error(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
         $auth_admin = AuthAdmin::where('id',$id)->field('username')->find();
         if (!$auth_admin || $auth_admin['username'] == 'admin' || !$auth_admin->delete()){
-            ResultVo::error(ErrorCode::NOT_NETWORK);
+            return ResultVo::error(ErrorCode::NOT_NETWORK);
         }
         // 删除权限
         AuthRoleAdmin::where('admin_id',$id)->delete();

@@ -55,7 +55,7 @@ class UploadController extends Base
         $dirname = str_replace(' ', '', $dirname);
         if (!file_exists($dirname)) {
             // 目录不存在
-            ResultVo::error(ErrorCode::DATA_NOT, "目录不存在");
+            return ResultVo::error(ErrorCode::DATA_NOT, "目录不存在");
         }
         $filename = request()->post('filename');
         $filename = trim($filename, DIRECTORY_SEPARATOR); // 去掉最后一个 / 并且加上一个 /
@@ -63,20 +63,20 @@ class UploadController extends Base
         $dirname = str_replace(' ', '', $dirname);
         if (file_exists($dirname)) {
             // 目录已存在
-            ResultVo::error(ErrorCode::DATA_NOT, "文件夹已存在");
+            return ResultVo::error(ErrorCode::DATA_NOT, "文件夹已存在");
         }
         try {
             // 如果含有中文
             if (preg_match('/[\x{4e00}-\x{9fa5}]/u', $dirname) > 0) {
-                ResultVo::error(ErrorCode::DATA_NOT, "不能含有中文");
+                return ResultVo::error(ErrorCode::DATA_NOT, "不能含有中文");
             }
             $dirname = str_replace(' ', '', $dirname);
             if (!mkdir($dirname, 0755, true)) {
                 // 目录不存在
-                ResultVo::error(ErrorCode::DATA_NOT, "无权限创建目录");
+                return ResultVo::error(ErrorCode::DATA_NOT, "无权限创建目录");
             }
         } catch (\Exception $exception) {
-            ResultVo::error(ErrorCode::DATA_NOT, "无权限创建");
+            return ResultVo::error(ErrorCode::DATA_NOT, "无权限创建");
         }
         $path = $pathName . '/' . $filename;
         $path = str_replace("\\", "/", $path);
@@ -108,12 +108,12 @@ class UploadController extends Base
         $uploadName = request()->param('uploadName');
         $uploadFile = request()->file($uploadName);
         if (empty($uploadFile)) {
-            ResultVo::error(ErrorCode::DATA_NOT, "没有文件上传");
+            return ResultVo::error(ErrorCode::DATA_NOT, "没有文件上传");
         }
         $pinYinName = request()->param('pinYinName', '');
         // 如果没有拼音的名称并且含有中文
         if (!$pinYinName && preg_match('/[\x{4e00}-\x{9fa5}]/u', $uploadFile->getInfo('name')) > 0) {
-            ResultVo::error(ErrorCode::DATA_NOT, "不能含有中文");
+            return ResultVo::error(ErrorCode::DATA_NOT, "不能含有中文");
         }
         $pathName = request()->param("pathName");
         $pathName = trim($pathName, '/'); // 去掉最前或者最后的 /
@@ -123,7 +123,7 @@ class UploadController extends Base
         $dirname = $basePath . $pathName;
         if (!is_dir(dirname($dirname))) {
             // 目录不存在
-            ResultVo::error(ErrorCode::DATA_NOT, "目录不存在");
+            return ResultVo::error(ErrorCode::DATA_NOT, "目录不存在");
         }
         $exts = request()->param("exts");
         $size = request()->param("size/d");
@@ -143,7 +143,7 @@ class UploadController extends Base
         $filepath = self::getBasePath() . $path;
         $info = $uploadFile->validate($config)->move($filepath, $savename, false);
         if (!$info) {
-            ResultVo::error(ErrorCode::DATA_NOT, $uploadFile->getError());
+            return ResultVo::error(ErrorCode::DATA_NOT, $uploadFile->getError());
         }
         $filename = $info->getSaveName();
         $path = $path . $filename;
@@ -183,7 +183,7 @@ class UploadController extends Base
 
         // 检查资源文件是否存在
         if (!self::checkPath($basePath)) {
-            ResultVo::error(ErrorCode::DATA_NOT, "目录不存在");
+            return ResultVo::error(ErrorCode::DATA_NOT, "目录不存在");
         }
 
         /* 获取文件列表 */

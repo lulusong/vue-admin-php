@@ -47,7 +47,7 @@ class PermissionRuleController extends BaseCheckUser
     public function save(){
         $data = $this->request->post();
         if (empty($data['name']) || empty($data['status'])){
-            ResultVo::error(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
+            return ResultVo::error(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
         $name = strtolower(strip_tags($data['name']));
         // 菜单模型
@@ -55,7 +55,7 @@ class PermissionRuleController extends BaseCheckUser
             ->field('name')
             ->find();
         if ($info){
-            ResultVo::error(ErrorCode::DATA_REPEAT, "权限已经存在");
+            return ResultVo::error(ErrorCode::DATA_REPEAT, "权限已经存在");
         }
 
         $now_time = time();
@@ -66,7 +66,7 @@ class PermissionRuleController extends BaseCheckUser
                 ->field('id')
                 ->find();
             if (!$info){
-                ResultVo::error(ErrorCode::NOT_NETWORK);
+                return ResultVo::error(ErrorCode::NOT_NETWORK);
             }
         }
         $auth_permission_rule = new AuthPermissionRule();
@@ -81,7 +81,7 @@ class PermissionRuleController extends BaseCheckUser
         $result = $auth_permission_rule->save();
 
         if (!$result){
-            ResultVo::error(ErrorCode::NOT_NETWORK);
+            return ResultVo::error(ErrorCode::NOT_NETWORK);
         }
         return ResultVo::success($auth_permission_rule);
     }
@@ -92,7 +92,7 @@ class PermissionRuleController extends BaseCheckUser
     public function edit(){
         $data = $this->request->post();
         if (empty($data['id']) || empty($data['name'])){
-            ResultVo::error(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
+            return ResultVo::error(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
         $id = $data['id'];
         $name = strtolower(strip_tags($data['name']));
@@ -101,7 +101,7 @@ class PermissionRuleController extends BaseCheckUser
             ->field('id')
             ->find();
         if (!$auth_permission_rule){
-            ResultVo::error(ErrorCode::DATA_NOT, "角色不存在");
+            return ResultVo::error(ErrorCode::DATA_NOT, "角色不存在");
         }
 
         $idInfo = AuthPermissionRule::where('name',$name)
@@ -109,7 +109,7 @@ class PermissionRuleController extends BaseCheckUser
             ->find();
         // 判断名称 是否重名，剔除自己
         if (!empty($idInfo['id']) && $idInfo['id'] != $id){
-            ResultVo::error(ErrorCode::DATA_REPEAT, "权限名称已存在");
+            return ResultVo::error(ErrorCode::DATA_REPEAT, "权限名称已存在");
         }
 
         $pid = isset($data['pid']) ? $data['pid'] : 0;
@@ -119,14 +119,14 @@ class PermissionRuleController extends BaseCheckUser
                 ->field('id')
                 ->find();
             if (!$info){
-                ResultVo::error(ErrorCode::NOT_NETWORK);
+                return ResultVo::error(ErrorCode::NOT_NETWORK);
             }
         }
         $AuthRuleList = AuthPermissionRule::all();
         // 查找当前选择的父级的所有上级
         $parents = AuthPermissionRule::queryParentAll($AuthRuleList,'id','pid',$pid);
         if (in_array($id,$parents)){
-            ResultVo::error(ErrorCode::NOT_NETWORK, "不能把自身/子级作为父级");
+            return ResultVo::error(ErrorCode::NOT_NETWORK, "不能把自身/子级作为父级");
         }
 
         $status = isset($data['status']) ? $data['status'] : 0;
@@ -140,7 +140,7 @@ class PermissionRuleController extends BaseCheckUser
         $result = $auth_permission_rule->save();
 
         if (!$result){
-            ResultVo::error(ErrorCode::DATA_CHANGE);
+            return ResultVo::error(ErrorCode::DATA_CHANGE);
         }
 
         return ResultVo::success("SUCCESS");
@@ -153,17 +153,17 @@ class PermissionRuleController extends BaseCheckUser
     public function delete(){
         $id = request()->post('id/d');
         if (empty($id)){
-            ResultVo::error(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
+            return ResultVo::error(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
 
         // 下面有子节点，不能删除
         $sub = AuthPermissionRule::where('pid',$id)->field('id')->find();
         if ($sub){
-            ResultVo::error(ErrorCode::NOT_NETWORK);
+            return ResultVo::error(ErrorCode::NOT_NETWORK);
         }
 
         if (!AuthPermissionRule::where('id',$id)->delete()){
-            ResultVo::error(ErrorCode::NOT_NETWORK);
+            return ResultVo::error(ErrorCode::NOT_NETWORK);
         }
 
         // 删除授权的权限

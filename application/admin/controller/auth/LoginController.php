@@ -25,24 +25,23 @@ class LoginController extends Base
     {
 
         if (!request()->isPost()){
-            ResultVo::error(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
+            return ResultVo::error(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
 
         $user_name = request()->post('userName');
         $pwd = request()->post('pwd');
-
         if (!$user_name || !$pwd){
-            ResultVo::error(ErrorCode::VALIDATION_FAILED, "username 不能为空。 password 不能为空。");
+            return ResultVo::error(ErrorCode::VALIDATION_FAILED, "username 不能为空。 password 不能为空。");
         }
         $admin = AuthAdmin::where('username',$user_name)
             ->field('id,username,avatar,password,status')
             ->find();
 
         if (empty($admin) ||  PassWordUtils::create($pwd) != $admin->password){
-            ResultVo::error(ErrorCode::USER_AUTH_FAIL);
+            return ResultVo::error(ErrorCode::USER_AUTH_FAIL);
         }
         if ($admin->status != 1){
-            ResultVo::error(ErrorCode::USER_NOT_PERMISSION);
+            return ResultVo::error(ErrorCode::USER_NOT_PERMISSION);
         }
 
         $info = $admin->toArray();
@@ -94,7 +93,7 @@ class LoginController extends Base
         $id = request()->header('X-Adminid');
         $token = request()->header('X-Token');
         if (!$id || !$token) {
-            ResultVo::error(ErrorCode::LOGIN_FAILED);
+            return ResultVo::error(ErrorCode::LOGIN_FAILED);
         }
         $res = AuthAdmin::loginInfo($id, (string)$token);
         $res['id'] = !empty($res['id']) ? intval($res['id']) : 0;
@@ -109,17 +108,17 @@ class LoginController extends Base
     public function out()
     {
         if (!request()->isPost()){
-            ResultVo::error(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
+            return ResultVo::error(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
 
         $id = request()->header('X-Adminid');
         $token = request()->header('X-Token');
         if (!$id || !$token) {
-            ResultVo::error(ErrorCode::LOGIN_FAILED);
+            return ResultVo::error(ErrorCode::LOGIN_FAILED);
         }
         $loginInfo = AuthAdmin::loginInfo($id,(string)$token);
         if ($loginInfo == false){
-            ResultVo::error(ErrorCode::LOGIN_FAILED);
+            return ResultVo::error(ErrorCode::LOGIN_FAILED);
         }
 
         AuthAdmin::loginOut($id);
@@ -134,32 +133,32 @@ class LoginController extends Base
      */
     public function password(){
         if (!request()->isPost()){
-            ResultVo::error(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
+            return ResultVo::error(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
         $id = request()->header('X-Adminid');
         $token = request()->header('X-Token');
         if (!$id || !$token) {
-            ResultVo::error(ErrorCode::LOGIN_FAILED);
+            return ResultVo::error(ErrorCode::LOGIN_FAILED);
         }
         $loginInfo = AuthAdmin::loginInfo($id,(string)$token);
         if ($loginInfo == false){
-            ResultVo::error(ErrorCode::LOGIN_FAILED);
+            return ResultVo::error(ErrorCode::LOGIN_FAILED);
         }
         $old_password = request()->post('old_password');
         $new_password = request()->post('new_password');
 
         $admin_info = AuthAdmin::where('id',$id)->field('username,password')->find();
         if ($admin_info['password'] != PassWordUtils::create($old_password)){
-            ResultVo::error(ErrorCode::USER_AUTH_FAIL, "原始密码错误");
+            return ResultVo::error(ErrorCode::USER_AUTH_FAIL, "原始密码错误");
         }
 
         if ($admin_info['password'] == PassWordUtils::create($new_password)){
-            ResultVo::error(ErrorCode::USER_AUTH_FAIL, "密码未做修改");
+            return ResultVo::error(ErrorCode::USER_AUTH_FAIL, "密码未做修改");
         }
 
         $admin_info->password = PassWordUtils::create($new_password);
         if (!$admin_info->save()){
-            ResultVo::error(ErrorCode::NOT_NETWORK);
+            return ResultVo::error(ErrorCode::NOT_NETWORK);
         }
 
         return ResultVo::success("SUCCESS");

@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "topthink/framework",
-            "version": "v5.1.14",
+            "version": "v5.1.19",
             "source": {
                 "type": "git",
                 "url": "https://github.com/top-think/framework.git",
-                "reference": "6448c4b42599d58125ba1307aa6d3defa044aeb9"
+                "reference": "3a0fea90ed2a99b181ce503090e08be1171ed091"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://files.phpcomposer.com/files/top-think/framework/6448c4b42599d58125ba1307aa6d3defa044aeb9.zip",
-                "reference": "6448c4b42599d58125ba1307aa6d3defa044aeb9",
+                "url": "https://api.github.com/repos/top-think/framework/zipball/3a0fea90ed2a99b181ce503090e08be1171ed091",
+                "reference": "3a0fea90ed2a99b181ce503090e08be1171ed091",
                 "shasum": ""
             },
             "require": {
@@ -55,7 +55,7 @@
                 "orm",
                 "thinkphp"
             ],
-            "time": "2018-05-19T13:37:11+00:00"
+            "time": "2018-07-13T14:10:28+00:00"
         },
         {
             "name": "topthink/think-installer",
@@ -67,7 +67,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://files.phpcomposer.com/files/top-think/think-installer/f5400a12c60e513911aef41fe443fa6920952675.zip",
+                "url": "https://api.github.com/repos/top-think/think-installer/zipball/f5400a12c60e513911aef41fe443fa6920952675",
                 "reference": "f5400a12c60e513911aef41fe443fa6920952675",
                 "shasum": ""
             },

@@ -33,7 +33,7 @@ class ResourceTagController extends Base
 
         $tag = request()->post('tag');
         if (empty($tag)){
-            ResultVo::error(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
+            return ResultVo::error(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
 
         $file_resource_tag = new FileResourceTag();
