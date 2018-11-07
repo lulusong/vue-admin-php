@@ -78,7 +78,7 @@ class AdController extends BaseCheckUser
         if (!$result){
             return ResultVo::error(ErrorCode::NOT_NETWORK);
         }
-        return json($ad);
+        return ResultVo::success($ad);
     }
 
     /**
@@ -113,7 +113,7 @@ class AdController extends BaseCheckUser
             return ResultVo::error(ErrorCode::DATA_CHANGE);
         }
 
-        return 'SUCCESS';
+        return ResultVo::success();
     }
 
     /**
@@ -128,7 +128,7 @@ class AdController extends BaseCheckUser
             return ResultVo::error(ErrorCode::NOT_NETWORK);
         }
 
-        return 'SUCCESS';
+        return ResultVo::success();
 
     }
 

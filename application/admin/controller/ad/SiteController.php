@@ -115,7 +115,7 @@ class SiteController extends BaseCheckUser
             return ResultVo::error(ErrorCode::NOT_NETWORK);
         }
         $ad_site->ad_ids = !empty($data['ad_ids']) ? $data['ad_ids'] : [];
-        return json($ad_site);
+        return ResultVo::success($ad_site);
     }
 
     /**
@@ -142,7 +142,7 @@ class SiteController extends BaseCheckUser
             return ResultVo::error(ErrorCode::DATA_CHANGE);
         }
 
-        return 'SUCCESS';
+        return ResultVo::success();
     }
 
     /**
@@ -153,12 +153,13 @@ class SiteController extends BaseCheckUser
         if (empty($site_id)){
             return ResultVo::error(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
+        // 这里广告位不让删除
         return ResultVo::error(ErrorCode::NOT_NETWORK, "此功能目前不开放");
         if (!AdSite::where('site_id',$site_id)->delete()){
             return ResultVo::error(ErrorCode::NOT_NETWORK);
         }
 
-        return 'SUCCESS';
+        return ResultVo::success();
 
     }
 

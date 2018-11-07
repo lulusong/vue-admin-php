@@ -17,10 +17,17 @@ class ResultVo
      */
     public $message;
 
-    private function __construct($code, $message)
+    /**
+     * data
+     * @var
+     */
+    public $data;
+
+    private function __construct($code, $message, $data)
     {
         $this->code = $code;
         $this->message = $message;
+        $this->data = $data;
     }
 
     /**
@@ -28,9 +35,13 @@ class ResultVo
      * @param $data
      * @return \think\response\Json
      */
-    public static function success($data)
+    public static function success($data = null)
     {
-        return json($data);
+        if (empty($data)) {
+            $data = new \stdClass();
+        }
+        $instance = new self(0, "success", $data);
+        return json($instance);
     }
 
     /**
@@ -45,7 +56,7 @@ class ResultVo
             $message = isset($code['message']) && $message == null ? $code['message'] : $message;
             $code = isset($code['code']) ? $code['code'] : null;
         }
-        $instance = new self($code, $message);
+        $instance = new self($code, $message, new \stdClass());
         return json($instance);
     }
 

@@ -123,7 +123,7 @@ class LoginController extends Base
 
         AuthAdmin::loginOut($id);
 
-        return ResultVo::success("SUCCESS");
+        return ResultVo::success();
 
     }
 
@@ -161,7 +161,7 @@ class LoginController extends Base
             return ResultVo::error(ErrorCode::NOT_NETWORK);
         }
 
-        return ResultVo::success("SUCCESS");
+        return ResultVo::success();
 
     }
 }

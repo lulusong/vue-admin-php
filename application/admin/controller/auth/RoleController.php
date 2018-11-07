@@ -87,7 +87,7 @@ class RoleController extends BaseCheckUser
             return ResultVo::error(ErrorCode::NOT_NETWORK);
         }
 
-        return ResultVo::success("SUCCESS");
+        return ResultVo::success();
 
     }
 
@@ -164,7 +164,7 @@ class RoleController extends BaseCheckUser
         }
 
 
-        return ResultVo::success("SUCCESS");
+        return ResultVo::success();
     }
 
 
@@ -180,7 +180,7 @@ class RoleController extends BaseCheckUser
             return ResultVo::error(ErrorCode::NOT_NETWORK);
         }
 
-        return ResultVo::success("SUCCESS");
+        return ResultVo::success();
 
     }
 

@@ -196,7 +196,7 @@ class AdminController extends BaseCheckUser
             $auth_role_admin->saveAll($temp);
         }
 
-        return ResultVo::success("SUCCESS");
+        return ResultVo::success();
     }
 
     /**
@@ -214,7 +214,7 @@ class AdminController extends BaseCheckUser
         // 删除权限
         AuthRoleAdmin::where('admin_id',$id)->delete();
 
-        return ResultVo::success("SUCCESS");
+        return ResultVo::success();
 
     }
 

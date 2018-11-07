@@ -143,7 +143,7 @@ class PermissionRuleController extends BaseCheckUser
             return ResultVo::error(ErrorCode::DATA_CHANGE);
         }
 
-        return ResultVo::success("SUCCESS");
+        return ResultVo::success();
     }
 
 
@@ -169,7 +169,7 @@ class PermissionRuleController extends BaseCheckUser
         // 删除授权的权限
         AuthPermission::where('permission_rule_id',$id)->delete();
 
-        return ResultVo::success("SUCCESS");
+        return ResultVo::success();
 
     }
 
