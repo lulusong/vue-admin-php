@@ -42,7 +42,10 @@ class SiteController extends BaseCheckUser
             }
             $v['ad_ids'] = $ad_ids;
         }
-        return ResultVo::success($lists);
+        $res = [];
+        $res["total"] = $lists->total();
+        $res["list"] = $lists->items();
+        return ResultVo::success($res);
 
     }
 
@@ -78,6 +81,7 @@ class SiteController extends BaseCheckUser
                 }
             }
         }
+        // 查询该页没有的广告
         if (count($lists) > 0 && $ad_ids) {
             $temp_data = Ad::whereIn('ad_id', $ad_ids)
                 ->field('ad_id,title,describe,status')

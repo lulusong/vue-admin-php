@@ -44,7 +44,11 @@ class ResourceController extends Base
             $v['create_time'] = strtotime($v['create_time']);
             $lists[$k] = $v;
         }
-        return ResultVo::success($lists);
+
+        $res = [];
+        $res["total"] = $lists->total();
+        $res["list"] = $lists->items();
+        return ResultVo::success($res);
     }
 
     /**

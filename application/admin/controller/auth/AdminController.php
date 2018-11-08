@@ -65,16 +65,34 @@ class AdminController extends BaseCheckUser
             $lists[$k] = $v;
         }
 
-        $role_list = AuthRole::where('status',1)
-            ->field('id,name')
-            ->order('id ASC')
-            ->select();
-
-        $res['admin_list'] = $lists;
-        $res['role_list'] = $role_list;
-
+        $res = [];
+        $res["total"] = $lists->total();
+        $res["list"] = $lists->items();
         return ResultVo::success($res);
 
+    }
+
+    /*
+     * 角色列表
+     */
+    public function roleList()
+    {
+        $where = [];
+        $limit = request()->get('limit/d', 20);
+        //分页配置
+        $paginate = [
+            'type' => 'bootstrap',
+            'var_page' => 'page',
+            'list_rows' => ($limit <= 0 || $limit > 20) ? 20 : $limit,
+        ];
+        $lists = AuthRole::where($where)
+            ->field('id,name')
+            ->paginate($paginate);
+
+        $res = [];
+        $res["total"] = $lists->total();
+        $res["list"] = $lists->items();
+        return ResultVo::success($res);
     }
 
     /**

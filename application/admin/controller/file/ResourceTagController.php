@@ -19,11 +19,22 @@ class ResourceTagController extends Base
      */
     public function index()
     {
+        $limit = request()->get('limit/d', 20);
+        //分页配置
+        $paginate = [
+            'type' => 'bootstrap',
+            'var_page' => 'page',
+            'list_rows' => ($limit <= 0 || $limit > 20) ? 20 : $limit,
+        ];
         $where = [];
-        $list = FileResourceTag::where($where)
+        $lists = FileResourceTag::where($where)
             ->field('id,tag')
-            ->select();
-        return ResultVo::success($list);
+            ->paginate($paginate);
+
+        $res = [];
+        $res["total"] = $lists->total();
+        $res["list"] = $lists->items();
+        return ResultVo::success($res);
     }
 
     /**

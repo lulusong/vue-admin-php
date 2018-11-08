@@ -33,12 +33,22 @@ class RoleController extends BaseCheckUser
             $where[] = ['name','like',$name . '%'];
             $order = '';
         }
+        $limit = request()->get('limit/d', 20);
+        //分页配置
+        $paginate = [
+            'type' => 'bootstrap',
+            'var_page' => 'page',
+            'list_rows' => ($limit <= 0 || $limit > 20) ? 20 : $limit,
+        ];
         $lists = AuthRole::where($where)
             ->field('id,name,status,remark,create_time,listorder')
             ->order($order)
-            ->select();
+            ->paginate($paginate);
 
-        return ResultVo::success($lists);
+        $res = [];
+        $res["total"] = $lists->total();
+        $res["list"] = $lists->items();
+        return ResultVo::success($res);
 
     }
 

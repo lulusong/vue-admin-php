@@ -47,7 +47,10 @@ class AdController extends BaseCheckUser
             $temp['env_version'] = !empty($v['env_version']) ? $v['env_version'] : '';
         }
 
-        return ResultVo::success($lists);
+        $res = [];
+        $res["total"] = $lists->total();
+        $res["list"] = $lists->items();
+        return ResultVo::success($res);
 
     }
 
