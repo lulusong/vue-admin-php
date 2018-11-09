@@ -34,11 +34,23 @@ class PermissionRuleController extends BaseCheckUser
         }
         $lists = AuthPermissionRule::getLists($where,$order);
         $merge_list = AuthPermissionRule::cateMerge($lists,'id','pid',0);
-        $tree_list = AuthPermissionRule::cateTree($lists,'id','pid',0);
-        $res['merge_list'] = $merge_list;
-        $res['tree_list'] = $tree_list;
+        $res['list'] = $merge_list;
         return ResultVo::success($res);
 
+    }
+
+    /*
+     * 获取树形结构
+     */
+    public function tree()
+    {
+        $where = [];
+        $order = 'id ASC';
+        $lists = AuthPermissionRule::getLists($where,$order);
+        $tree_list = AuthPermissionRule::cateTree($lists,'id','pid',0);
+        $res = [];
+        $res['list'] = $tree_list;
+        return ResultVo::success($res);
     }
 
     /**

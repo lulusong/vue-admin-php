@@ -53,30 +53,34 @@ class RoleController extends BaseCheckUser
     }
 
     /*
+     * 获取授权列表
+     */
+    public function authList()
+    {
+        $id = request()->get('id/d','');
+        $auth_permission = AuthPermission::where('role_id',$id)
+            ->field(['permission_rule_id'])
+            ->select();
+        $rule_list = AuthPermissionRule::getLists([],'id ASC');
+        $checked_keys = [];
+        foreach ($rule_list as $key=>$value){
+            foreach ($auth_permission as $k=>$v){
+                if (strtolower($value['id']) == strtolower($v['permission_rule_id'])){
+                    $checked_keys[] = $v['permission_rule_id'];
+                }
+            }
+        }
+
+        $merge_list = AuthPermissionRule::cateMerge($rule_list,'id','pid',0);
+        $res['auth_list'] = $merge_list;
+        $res['checked_keys'] = $checked_keys;
+        return ResultVo::success($res);
+    }
+
+    /*
      * 授权
      */
     public function auth(){
-        if (request()->isGet()){
-            $id = request()->get('id/d','');
-            $auth_permission = AuthPermission::where('role_id',$id)
-                ->field(['permission_rule_id'])
-                ->select();
-            $rule_list = AuthPermissionRule::getLists([],'id ASC');
-            $checked_keys = [];
-            foreach ($rule_list as $key=>$value){
-                foreach ($auth_permission as $k=>$v){
-                    if (strtolower($value['id']) == strtolower($v['permission_rule_id'])){
-                        $checked_keys[] = $v['permission_rule_id'];
-                    }
-                }
-            }
-
-            $merge_list = AuthPermissionRule::cateMerge($rule_list,'id','pid',0);
-            $res['auth_list'] = $merge_list;
-            $res['checked_keys'] = $checked_keys;
-            return ResultVo::success($res);
-        }
-
         $data = request()->post();
         $role_id = isset($data['role_id']) ? $data['role_id'] : '';
         if (!$role_id){
