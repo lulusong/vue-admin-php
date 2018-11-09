@@ -4,8 +4,11 @@
 
 **项目后端地址：** <a href="https://github.com/lmxdawn/vue-admin-php" target="_blank">https://github.com/lmxdawn/vue-admin-php</a>
 
-# 觉得有用请 star
+# 欢迎 star
 
+# 整体效果
+
+![donate](https://lmxdawn.github.io/images/show-how1.jpg)
 
 # vue-admin-php
 
