@@ -117,7 +117,7 @@ class AdminController extends BaseCheckUser
         $auth_admin->username = $username;
         $auth_admin->password = PassWordUtils::create($data['password']);
         $auth_admin->status = $status;
-        $auth_admin->create_time = time();
+        $auth_admin->create_time = date("Y-m-d H:i:s");
         $result = $auth_admin->save();
 
         if (!$result){

@@ -122,7 +122,7 @@ class RoleController extends BaseCheckUser
             return ResultVo::error(ErrorCode::DATA_REPEAT);
         }
 
-        $now_time = time();
+        $now_time = date("Y-m-d H:i:s");
         $status = isset($data['status']) ? $data['status'] : 0;
         $auth_role = new AuthRole();
         $auth_role->name = $name;
@@ -169,7 +169,7 @@ class RoleController extends BaseCheckUser
         $auth_role->name = $name;
         $auth_role->status = $status;
         $auth_role->remark = isset($data['remark']) ? strip_tags($data['remark']) : '';
-        $auth_role->update_time = time();
+        $auth_role->update_time = date("Y-m-d H:i:s");
         $auth_role->listorder = isset($data['listorder']) ? intval($data['listorder']) : 999;
         $result = $auth_role->save();
 

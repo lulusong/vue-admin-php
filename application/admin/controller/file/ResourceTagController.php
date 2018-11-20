@@ -52,7 +52,7 @@ class ResourceTagController extends Base
         $file_resource_tag->create_time = date("Y-m-d H:i:s");
         $file_resource_tag->save();
         $file_resource_tag->id = intval($file_resource_tag->id);
-        $file_resource_tag->create_time = time();
+        $file_resource_tag->create_time = date("Y-m-d H:i:s");
         return ResultVo::success($file_resource_tag);
     }
 

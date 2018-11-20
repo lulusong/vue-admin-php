@@ -76,7 +76,7 @@ class ResourceController extends Base
         $file_resource->ext = $ext;
         $file_resource->create_time = date("Y-m-d H:i:s");
         $file_resource->save();
-        $file_resource->create_time = time();
+        $file_resource->create_time = date("Y-m-d H:i:s");
         $file_resource->url = PublicFileUtils::createUploadUrl($path);
         $file_resource->id = intval($file_resource->id);
         return ResultVo::success($file_resource);

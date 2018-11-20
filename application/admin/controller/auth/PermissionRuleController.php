@@ -70,7 +70,7 @@ class PermissionRuleController extends BaseCheckUser
             return ResultVo::error(ErrorCode::DATA_REPEAT, "权限已经存在");
         }
 
-        $now_time = time();
+        $now_time = date("Y-m-d H:i:s");
         $status = !empty($data['status']) ? $data['status'] : 0;
         $pid = !empty($data['pid']) ? $data['pid'] : 0;
         if ($pid){
@@ -148,7 +148,7 @@ class PermissionRuleController extends BaseCheckUser
         $auth_permission_rule->status = $status;
         $auth_permission_rule->condition = !empty($data['condition']) ? $data['condition'] : ' ';
         $auth_permission_rule->listorder = !empty($data['listorder']) ? strip_tags($data['listorder']) : 0;
-        $auth_permission_rule->update_time = time();
+        $auth_permission_rule->update_time = date("Y-m-d H:i:s");
         $result = $auth_permission_rule->save();
 
         if (!$result){

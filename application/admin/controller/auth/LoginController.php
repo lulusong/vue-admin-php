@@ -77,7 +77,7 @@ class LoginController extends Base
         // 保存用户信息
         $loginInfo = AuthAdmin::loginInfo($info['id'],$info);
         $admin->last_login_ip = request()->ip();
-        $admin->last_login_time = time();
+        $admin->last_login_time = date("Y-m-d H:i:s");
         $admin->save();
         $res = [];
         $res['id'] = !empty($loginInfo['id']) ? intval($loginInfo['id']) : 0;
