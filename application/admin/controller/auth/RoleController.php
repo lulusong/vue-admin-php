@@ -58,18 +58,15 @@ class RoleController extends BaseCheckUser
     public function authList()
     {
         $id = request()->get('id/d','');
+        $checked_keys = [];
         $auth_permission = AuthPermission::where('role_id',$id)
             ->field(['permission_rule_id'])
             ->select();
-        $rule_list = AuthPermissionRule::getLists([],'id ASC');
-        $checked_keys = [];
-        foreach ($rule_list as $key=>$value){
-            foreach ($auth_permission as $k=>$v){
-                if ($value['id'] == $v['permission_rule_id']){
-                    $checked_keys[] = $v['permission_rule_id'];
-                }
-            }
+        foreach ($auth_permission as $k=>$v){
+            $checked_keys[] = $v['permission_rule_id'];
         }
+
+        $rule_list = AuthPermissionRule::getLists([],'id ASC');
 
         $merge_list = AuthPermissionRule::cateMerge($rule_list,'id','pid',0);
         $res['auth_list'] = $merge_list;
