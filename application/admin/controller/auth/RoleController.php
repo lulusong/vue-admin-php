@@ -65,7 +65,7 @@ class RoleController extends BaseCheckUser
         $checked_keys = [];
         foreach ($rule_list as $key=>$value){
             foreach ($auth_permission as $k=>$v){
-                if (strtolower($value['id']) == strtolower($v['permission_rule_id'])){
+                if (strtolower($value['id']) == $v['permission_rule_id']){
                     $checked_keys[] = $v['permission_rule_id'];
                 }
             }
