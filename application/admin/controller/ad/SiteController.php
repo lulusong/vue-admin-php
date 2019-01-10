@@ -33,7 +33,7 @@ class SiteController extends BaseCheckUser
             'list_rows' => ($limit <= 0 || $limit > 20) ? 20 : $limit,
         ];
         $lists = AdSite::where($where)
-            ->field('site_id,site_name,describe,ad_ids')
+            ->field('site_id,site_name,describe,ad_ids,modified_time')
             ->paginate($paginate);
         $where_ad_ids = [];
         foreach ($lists as $v) {

@@ -37,6 +37,7 @@ class AdController extends BaseCheckUser
                 channel_type,channel_list,android_version_type,android_version_list,ios_version_type,ios_version_list,
                 new_show_start_num,new_show_max_num,old_show_start_num,old_show_max_num,
                 start_time,end_time,event_name,status')
+            ->order("adId DESC")
             ->paginate($paginate);
 
         foreach ($lists as $k => $v) {
@@ -52,7 +53,6 @@ class AdController extends BaseCheckUser
         return ResultVo::success($res);
 
     }
-
     /**
      * 添加
      */
