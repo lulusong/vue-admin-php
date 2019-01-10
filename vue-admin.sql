@@ -230,3 +230,50 @@ CREATE TABLE `file_resource_tag` (
 -- Records of file_resource_tag
 -- ----------------------------
 INSERT INTO `file_resource_tag` VALUES ('1', '测试', '2018-05-30 20:41:48');
+
+-- ----------------------------
+-- Table structure for ad
+-- ----------------------------
+DROP TABLE IF EXISTS `ad`;
+CREATE TABLE `ad` (
+  `ad_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '广告ID',
+  `title` varchar(255) NOT NULL COMMENT '广告标题',
+  `describe` varchar(255) NOT NULL DEFAULT '' COMMENT '描述',
+  `pic` varchar(255) NOT NULL DEFAULT '' COMMENT '图片的地址',
+  `jump_type` tinyint(4) unsigned NOT NULL DEFAULT '0' COMMENT '跳转方式（0，web 页面，1：APP内链接，2：小程序）',
+  `jump_url` varchar(255) NOT NULL DEFAULT '' COMMENT '跳转的url路径',
+  `ios_url` varchar(255) NOT NULL DEFAULT '' COMMENT 'ios 的类名',
+  `android_url` varchar(255) NOT NULL DEFAULT '' COMMENT 'android 的类名',
+  `wxa_appid` varchar(50) NOT NULL DEFAULT '' COMMENT '微信小程序的APPID（跳转类型为 1 时有效）',
+  `channel_type` tinyint(4) NOT NULL DEFAULT '0' COMMENT '渠道名单类型（0：不做处理，1：白名单，2：黑名单）',
+  `channel_list` varchar(255) NOT NULL DEFAULT '' COMMENT '渠道黑名单',
+  `android_version_type` tinyint(4) unsigned NOT NULL DEFAULT '0' COMMENT 'android 版本名单类型（0：不做处理，1：白名单，2：黑名单）',
+  `android_version_list` varchar(255) NOT NULL DEFAULT '' COMMENT 'android 版本黑名单',
+  `ios_version_type` tinyint(4) unsigned NOT NULL DEFAULT '0' COMMENT 'ios 版本名单类型（0：不做处理，1：白名单，2：黑名单）',
+  `ios_version_list` varchar(255) NOT NULL DEFAULT '' COMMENT 'ios 版本黑名单',
+  `new_show_start_num` int(11) NOT NULL DEFAULT '0' COMMENT '新用户从第几次开始展示',
+  `new_show_max_num` int(11) NOT NULL DEFAULT '0' COMMENT '新用户最大展示几次',
+  `old_show_start_num` int(11) NOT NULL DEFAULT '0' COMMENT '老用户第几次开始展示',
+  `old_show_max_num` int(11) NOT NULL DEFAULT '0' COMMENT '老用户最大展示几次',
+  `start_time` datetime DEFAULT NULL COMMENT '开始时间',
+  `end_time` datetime DEFAULT NULL COMMENT '结束时间',
+  `event_name` varchar(255) NOT NULL DEFAULT '' COMMENT '统计事件名称',
+  `status` tinyint(4) NOT NULL DEFAULT '0' COMMENT '广告状态（0：禁用，1：正常）',
+  `create_time` datetime NOT NULL COMMENT '创建时间',
+  `modified_time` datetime NOT NULL COMMENT '更新时间',
+  PRIMARY KEY (`ad_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='广告表';
+
+-- ----------------------------
+-- Table structure for ad_site
+-- ----------------------------
+DROP TABLE IF EXISTS `ad_site`;
+CREATE TABLE `ad_site` (
+  `site_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '广告位id',
+  `site_name` varchar(255) NOT NULL COMMENT '广告位名称',
+  `describe` varchar(255) NOT NULL DEFAULT '' COMMENT '广告位描述',
+  `ad_ids` varchar(255) NOT NULL DEFAULT '' COMMENT '广告位的广告id（用 , 隔开）',
+  `create_time` datetime NOT NULL COMMENT '创建时间',
+  `modified_time` datetime NOT NULL COMMENT '更新时间',
+  PRIMARY KEY (`site_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='广告位';

@@ -108,7 +108,7 @@ class RoleController extends BaseCheckUser
     public function save(){
         $data = request()->post();
         if (empty($data['name']) || empty($data['status'])){
-            return ResultVo::error(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
+            return ResultVo::error(ErrorCode::DATA_VALIDATE_FAIL);
         }
         $name = $data['name'];
         // 菜单模型
@@ -133,7 +133,9 @@ class RoleController extends BaseCheckUser
             return ResultVo::error(ErrorCode::NOT_NETWORK);
         }
 
-        return ResultVo::success($auth_role);
+        $res = [];
+        $res["id"] = intval($auth_role->id);
+        return ResultVo::success($res);
     }
 
     /**
@@ -142,7 +144,7 @@ class RoleController extends BaseCheckUser
     public function edit(){
         $data = request()->post();
         if (empty($data['id']) || empty($data['name'])){
-            return ResultVo::error(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
+            return ResultVo::error(ErrorCode::DATA_VALIDATE_FAIL);
         }
         $id = $data['id'];
         $name = strip_tags($data['name']);
@@ -185,7 +187,7 @@ class RoleController extends BaseCheckUser
     public function delete(){
         $id = request()->post('id/d');
         if (empty($id)){
-            return ResultVo::error(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
+            return ResultVo::error(ErrorCode::DATA_VALIDATE_FAIL);
         }
         if (!AuthRole::where('id',$id)->delete()){
             return ResultVo::error(ErrorCode::NOT_NETWORK);

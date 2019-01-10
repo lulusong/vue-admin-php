@@ -59,7 +59,7 @@ class PermissionRuleController extends BaseCheckUser
     public function save(){
         $data = $this->request->post();
         if (empty($data['name']) || empty($data['status'])){
-            return ResultVo::error(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
+            return ResultVo::error(ErrorCode::DATA_VALIDATE_FAIL);
         }
         $name = strtolower(strip_tags($data['name']));
         // 菜单模型
@@ -95,7 +95,9 @@ class PermissionRuleController extends BaseCheckUser
         if (!$result){
             return ResultVo::error(ErrorCode::NOT_NETWORK);
         }
-        return ResultVo::success($auth_permission_rule);
+        $res = [];
+        $res["id"] = intval($auth_permission_rule->id);
+        return ResultVo::success($res);
     }
 
     /**
@@ -104,7 +106,7 @@ class PermissionRuleController extends BaseCheckUser
     public function edit(){
         $data = $this->request->post();
         if (empty($data['id']) || empty($data['name'])){
-            return ResultVo::error(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
+            return ResultVo::error(ErrorCode::DATA_VALIDATE_FAIL);
         }
         $id = $data['id'];
         $name = strtolower(strip_tags($data['name']));
@@ -165,7 +167,7 @@ class PermissionRuleController extends BaseCheckUser
     public function delete(){
         $id = request()->post('id/d');
         if (empty($id)){
-            return ResultVo::error(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
+            return ResultVo::error(ErrorCode::DATA_VALIDATE_FAIL);
         }
 
         // 下面有子节点，不能删除

@@ -101,7 +101,7 @@ class AdminController extends BaseCheckUser
     public function save(){
         $data = request()->post();
         if (empty($data['username']) || empty($data['password'])){
-            return ResultVo::error(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
+            return ResultVo::error(ErrorCode::DATA_VALIDATE_FAIL);
         }
         $username = $data['username'];
         // 模型
@@ -139,10 +139,9 @@ class AdminController extends BaseCheckUser
             $auth_role_admin->saveAll($temp);
         }
 
-        $auth_admin['password'] = '';
-        $auth_admin['roles'] = $roles;
-
-        return ResultVo::success($auth_admin);
+        $res = [];
+        $res["id"] = intval($admin_id);
+        return ResultVo::success($res);
     }
 
     /**
@@ -151,7 +150,7 @@ class AdminController extends BaseCheckUser
     public function edit(){
         $data = request()->post();
         if (empty($data['id']) || empty($data['username'])){
-            return ResultVo::error(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
+            return ResultVo::error(ErrorCode::DATA_VALIDATE_FAIL);
         }
         $id = $data['id'];
         $username = strip_tags($data['username']);
@@ -223,7 +222,7 @@ class AdminController extends BaseCheckUser
     public function delete(){
         $id = request()->post('id/d');
         if (empty($id)){
-            return ResultVo::error(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
+            return ResultVo::error(ErrorCode::DATA_VALIDATE_FAIL);
         }
         $auth_admin = AuthAdmin::where('id',$id)->field('username')->find();
         if (!$auth_admin || $auth_admin['username'] == 'admin' || !$auth_admin->delete()){

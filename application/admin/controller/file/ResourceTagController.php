@@ -44,16 +44,16 @@ class ResourceTagController extends Base
 
         $tag = request()->post('tag');
         if (empty($tag)){
-            return ResultVo::error(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
+            return ResultVo::error(ErrorCode::DATA_VALIDATE_FAIL);
         }
 
         $file_resource_tag = new FileResourceTag();
         $file_resource_tag->tag = $tag;
         $file_resource_tag->create_time = date("Y-m-d H:i:s");
         $file_resource_tag->save();
-        $file_resource_tag->id = intval($file_resource_tag->id);
-        $file_resource_tag->create_time = date("Y-m-d H:i:s");
-        return ResultVo::success($file_resource_tag);
+        $res = [];
+        $res["id"] = intval($file_resource_tag->id);
+        return ResultVo::success($res);
     }
 
 

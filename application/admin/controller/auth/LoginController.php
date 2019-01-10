@@ -96,6 +96,9 @@ class LoginController extends Base
             return ResultVo::error(ErrorCode::LOGIN_FAILED);
         }
         $res = AuthAdmin::loginInfo($id, (string)$token);
+        if (empty($res["id"])) {
+            return ResultVo::error(ErrorCode::LOGIN_FAILED);
+        }
         $res['id'] = !empty($res['id']) ? intval($res['id']) : 0;
         $res['avatar'] = !empty($res['avatar']) ? PublicFileUtils::createUploadUrl($res['avatar']) : '';
         // $res['roles'] = ['admin'];
