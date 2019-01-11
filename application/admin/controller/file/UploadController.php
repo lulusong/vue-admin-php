@@ -30,7 +30,7 @@ class UploadController extends Base
     }
 
 
-    public function create() {
+    public function createFile() {
         /**
          * @var File $uploadFile
          */
