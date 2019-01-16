@@ -134,8 +134,8 @@ class AdController extends BaseCheckUser
         $ad->old_show_max_num = !empty($data["old_show_max_num"]) ? intval($data["old_show_max_num"]) : 0;
 
 
-        $ad->start_time = !empty($data['start_time']) && strtotime($data['start_time']) ? date("Y-m-d H:i:s", strtotime($data['start_time'])) : '';
-        $ad->end_time = !empty($data['end_time']) && strtotime($data['end_time']) ? date("Y-m-d H:i:s", strtotime($data['end_time'])) : '';
+        $ad->start_time = !empty($data['start_time']) && strtotime($data['start_time']) ? date("Y-m-d H:i:s", strtotime($data['start_time'])) : null;
+        $ad->end_time = !empty($data['end_time']) && strtotime($data['end_time']) ? date("Y-m-d H:i:s", strtotime($data['end_time'])) : null;
         $ad->status = $status;
         $ad->create_time = date("Y-m-d H:i:s");
         $ad->modified_time = date("Y-m-d H:i:s");
@@ -238,8 +238,8 @@ class AdController extends BaseCheckUser
         $ad->old_show_max_num = !empty($data["old_show_max_num"]) ? intval($data["old_show_max_num"]) : 0;
 
 
-        $ad->start_time = !empty($data['start_time']) && strtotime($data['start_time']) ? date("Y-m-d H:i:s", strtotime($data['start_time'])) : '';
-        $ad->end_time = !empty($data['end_time']) && strtotime($data['end_time']) ? date("Y-m-d H:i:s", strtotime($data['end_time'])) : '';
+        $ad->start_time = !empty($data['start_time']) && strtotime($data['start_time']) ? date("Y-m-d H:i:s", strtotime($data['start_time'])) : null;
+        $ad->end_time = !empty($data['end_time']) && strtotime($data['end_time']) ? date("Y-m-d H:i:s", strtotime($data['end_time'])) : null;
         $status = isset($data['status']) ? $data['status'] : 0;
         $ad->status = $status;
         $ad->create_time = date("Y-m-d H:i:s");
