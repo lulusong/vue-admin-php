@@ -20,17 +20,20 @@ class UploadController extends Base
     /**
      * 上传token
      */
-    public function qiuNiuUpToken() {
+    public function qiuNiuUpToken()
+    {
 
         $res = [];
         $res["upload_url"] = PublicFileUtils::getUploadBaseUrl();
         $res["up_token"] = "xxxxxxxx";
+        $res["domain"] = PublicFileUtils::getDomainBaseUrl();
 
         return ResultVo::success($res);
     }
 
 
-    public function createFile() {
+    public function createFile()
+    {
         /**
          * @var File $uploadFile
          */
@@ -58,7 +61,7 @@ class UploadController extends Base
         }
         $basepath = Env::get('root_path') . 'public' . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR;
         $filePath = (!empty($filePath) ? $filePath : "resources") . DIRECTORY_SEPARATOR;
-        $filepath = $basepath . $filePath ;
+        $filepath = $basepath . $filePath;
         $info = $uploadFile->validate($config)->move($filepath);
         if (!$info) {
             return ResultVo::error(ErrorCode::DATA_NOT, $uploadFile->getError());

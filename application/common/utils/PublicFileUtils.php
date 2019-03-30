@@ -23,12 +23,15 @@ class PublicFileUtils
      */
     public static function createUploadUrl($file_path = '', $bucket = 'bucket')
     {
+        if (empty($file_path)) {
+            return "";
+        }
         if(strpos($file_path,"http") === 0){
             return $file_path;
         }else if(strpos($file_path,"/") === 0){
             return $file_path;
         }
-        $domain = config('public_file.bucket.domain');
+        $domain = self::getDomainBaseUrl();
         $url = $domain . '/' . $file_path;
         return $url;
     }
@@ -38,9 +41,25 @@ class PublicFileUtils
      * @param string $bucket 空间名称
      * @return string
      */
-    public static function getUploadBaseUrl($bucket = 'bucket')
+    public static function getUploadBaseUrl()
     {
-        $domain = config('public_file.bucket.upload_url');
+        $upload_url = config('public_file.bucket.upload_url');
+        if (empty($domain)) {
+            $upload_url = url("createFile", '', false, true);
+        }
+        return $upload_url;
+    }
+
+    /**
+     * 获取公共文件的基础域名
+     * @return string
+     */
+    public static function getDomainBaseUrl()
+    {
+        $domain = config('public_file.bucket.domain');
+        if (empty($domain)) {
+            $domain = url("/uploads/", "", false, true);
+        }
         return $domain;
     }
 
