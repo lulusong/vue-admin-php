@@ -9,6 +9,7 @@
 namespace app\common\utils;
 
 
+use app\common\exception\JsonException;
 use think\facade\Cache;
 
 /*
@@ -19,18 +20,18 @@ class RedisUtils
 {
 
     /**
-     * 获取 redis 实例
-     * @return bool|\Redis
+     * @param string $store
+     * @return \Redis
+     * @throws JsonException
      */
-
-    public static function init()
+    public static function init($store = "default")
     {
-        $redis = Cache::init()->handler();
+        $redis = Cache::store($store)->handler();
         // 判断缓存类是否为 redis
         if ($redis instanceof \Redis){
             return $redis;
         }
-        return false;
+        throw new JsonException(1, "Redis link timeout");
     }
 
 }
