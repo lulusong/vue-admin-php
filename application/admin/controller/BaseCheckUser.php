@@ -2,7 +2,6 @@
 
 namespace app\admin\controller;
 
-use app\common\model\auth\AuthAdmin;
 use think\facade\Hook;
 
 /**
@@ -20,14 +19,8 @@ class BaseCheckUser extends Base
 
         // 监听登录的钩子
         $params = [];
-        Hook::listen('app_init',$params);
-
-        $id = request()->header('X-Adminid');
-        $token = request()->header('X-Token');
-        $login_info = AuthAdmin::loginInfo($id, (string)$token);
+        $login_info = Hook::exec('app\\admin\\behavior\\CheckAuth', []);
         $this->adminInfo = $login_info;
-
-
     }
 
 }

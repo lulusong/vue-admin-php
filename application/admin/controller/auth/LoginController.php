@@ -11,6 +11,7 @@ use app\common\model\auth\AuthRoleAdmin;
 use app\common\utils\PassWordUtils;
 use app\common\utils\PublicFileUtils;
 use app\common\vo\ResultVo;
+use think\facade\Hook;
 
 /**
  * 登录
@@ -67,13 +68,13 @@ class LoginController extends Base
             }
         }
         $info['authRules'] = $authRules;
-       // $info['authRules'] = [
-       //     'user_manage',
-       //     'user_manage/admin_manage',
-       //     'admin/admin/index',
-       //     'admin/role/index',
-       //     'admin/auth_admin/index',
-       // ];
+        // $info['authRules'] = [
+        //     'user_manage',
+        //     'user_manage/admin_manage',
+        //     'admin/admin/index',
+        //     'admin/role/index',
+        //     'admin/auth_admin/index',
+        // ];
         // 保存用户信息
         $loginInfo = AuthAdmin::loginInfo($info['id'],$info);
         $admin->last_login_ip = request()->ip();
@@ -90,12 +91,7 @@ class LoginController extends Base
      */
     public function userInfo()
     {
-        $id = request()->header('X-Adminid');
-        $token = request()->header('X-Token');
-        if (!$id || !$token) {
-            return ResultVo::error(ErrorCode::LOGIN_FAILED);
-        }
-        $res = AuthAdmin::loginInfo($id, (string)$token);
+        $res = Hook::exec('app\\admin\\behavior\\CheckAuth', []);
         if (empty($res["id"])) {
             return ResultVo::error(ErrorCode::LOGIN_FAILED);
         }
