@@ -35,7 +35,7 @@ class CheckAuth
             throw new JsonException(ErrorCode::LOGIN_FAILED);
         }
         // 排除权限
-        $not_check = [];
+        $not_check = ["admin/auth.login/userinfo"];
 
         //检查权限
         $module     = request()->module();
