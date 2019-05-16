@@ -110,8 +110,8 @@ class LoginController extends Base
             return ResultVo::error(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
 
-        $id = request()->header('X-Adminid');
-        $token = request()->header('X-Token');
+        $id = request()->get('ADMIN_ID');
+        $token = request()->get('ADMIN_TOKEN');
         if (!$id || !$token) {
             return ResultVo::error(ErrorCode::LOGIN_FAILED);
         }
@@ -134,8 +134,8 @@ class LoginController extends Base
         if (!request()->isPost()){
             return ResultVo::error(ErrorCode::HTTP_METHOD_NOT_ALLOWED);
         }
-        $id = request()->header('X-Adminid');
-        $token = request()->header('X-Token');
+        $id = request()->get('ADMIN_ID');
+        $token = request()->get('ADMIN_TOKEN');
         if (!$id || !$token) {
             return ResultVo::error(ErrorCode::LOGIN_FAILED);
         }
