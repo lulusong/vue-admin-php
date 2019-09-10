@@ -166,6 +166,8 @@ class SiteController extends BaseCheckUser
             if (!empty($ad_ids)) {
                 $ad_site->ad_ids = implode(",", $ad_ids);
             }
+        } else {
+            $ad_site->ad_ids = "";
         }
         $ad_site->modified_time = date("Y-m-d H:i:s");
         $result = $ad_site->save();
