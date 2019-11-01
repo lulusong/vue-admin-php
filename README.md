@@ -31,10 +31,10 @@
 - [x] 401/404错误页面
 - [x] 动态面包屑
 - [x] 动态侧边栏
-- [x] 广告管理
+- [x] 广告管
 
 
-## 安装步骤 ##
+## 安装步 #
 
 	git clone https://github.com/lmxdawn/vue-admin-php.git      // 把模板下载到本地
 	cd vue-admin-php    // 进入模板目录
